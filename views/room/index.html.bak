@@ -1,0 +1,27 @@
+{{extend 'layout.html'}}
+<p style="color:white">Here's a placeholder for information</p>
+
+<script>
+document.body.style.background ="#1a1a1a";
+</script>
+
+<div class="span9" style="margin-left:0">
+   <div id="canvas_toolbar" class="span9" style="margin-left:0">
+   </div>
+   <div id="cvsCont" class="span9" style="margin-left:0"> 
+      <canvas style="position:absolute" id="BGcvs">
+         
+      </canvas>
+      <canvas style="position:absolute;" id="cvs">
+         
+      </canvas>
+   </div>
+</div>
+   <div class="span3" >
+      <p style="color:white"> this is a chat box! </p>
+      {{=IMG(_src=URL('static', 'images/btn1out.png'), _id='toolbtnX')}}
+      {{=IMG(_src=URL('static', 'images/btn2out.png'), _id='toolbtnY')}}
+   </div>
+</div>
+
+<script src={{=URL('static', 'js/canvasDraw.js')}}></script>

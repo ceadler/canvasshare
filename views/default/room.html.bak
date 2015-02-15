@@ -1,0 +1,6 @@
+
+<div class="span12" style="border:solid red; margin-left:0"> 
+   <p style="text-align:center">
+      {{=A('Get started with CanvasShare', _class='btn', _href='')}}
+   </p>
+</div>
