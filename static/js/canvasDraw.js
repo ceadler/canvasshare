@@ -6,6 +6,7 @@ var boundingRect = canvasContainer.getBoundingClientRect();
 
 canvas.onselectstart = function () { return false; } // makes the canvas itself unselectable
 BGcanvas.onselectstart = function () { return false; }
+document.onselectstart = function () { if(drawing){return false;} }
 
 canvas.position = BGcanvas.position = "absolute";
 canvas.style.left = BGcanvas.style.left = boundingRect.left;
@@ -32,6 +33,9 @@ var dataPts = new Array(0);
 var initX = 0; // just a smaller name for dataPts[0][0] and dataPts [0][1]
 var initY = 0;
 var initE;
+var cvsLeft =  $('#cvs').offset().left //updated every time we start drawing
+var cvsTop =  $('#cvs').offset().top
+console.log(cvsLeft, cvsTop);
 var drawing = false // a boolean that determines if things are currently being drawn
 
 
@@ -43,7 +47,7 @@ function clearSelection() { //clears the selection of any text. Having text
 }
 
 function clearCanvas() {ctx.clearRect(0, 0, canvas.width, canvas.height);}
-function distE(e1, e2) {return Math.sqrt(Math.pow(e1.offsetX-e2.offsetX,2) + Math.pow(e1.offsetY-e2.offsetY,2));}
+function distE(e1, e2) {return Math.sqrt(Math.pow(e1.pageX-e2.pageX,2) + Math.pow(e1.pageY-e2.pageY,2));}
 function dist(x1, y1, x2, y2) { return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2))}
 
 function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically generated) 
@@ -72,9 +76,9 @@ for (t in tools){
 
 //MOUSE LISTENERS
 $("#cvs").mousedown(startDrawing);
-$("#cvs").mousemove(updateDrawing);
-$("#cvs").mouseleave(cancelDrawing);
-$("#cvs" ).mouseup(finishDrawing);
+$(document).mousemove(updateDrawing);
+//$("#cvs").mouseleave(cancelDrawing);
+$(document).mouseup(finishDrawing);
 
 //KEYBOARD LISTENERS
 $(document).keydown(function(e){ 
@@ -92,8 +96,10 @@ function startDrawing(mouseEvt){
    clearCanvas(); 
    drawing = true; //bool to start drawing
    initE = mouseEvt;
-   initX = mouseEvt.offsetX;
-   initY = mouseEvt.offsetY;
+   cvsLeft =  $('#cvs').offset().left
+   cvsTop =  $('#cvs').offset().top
+   initX = mouseEvt.pageX - cvsLeft;
+   initY = mouseEvt.pageY - cvsTop;
    ctx.moveTo(initX, initY); 
    ctx.beginPath();
    dataPts.push([initX, initY]); //put this point as the initial point in the array
@@ -103,8 +109,8 @@ function updateDrawing(mouseEvt) {
    if (drawing){
       switch(currentTool){
          case "freehand": 
-            dataPts.push([mouseEvt.offsetX, mouseEvt.offsetY]);
-            ctx.lineTo(mouseEvt.offsetX, mouseEvt.offsetY);
+            dataPts.push([mouseEvt.pageX- cvsLeft, mouseEvt.pageY- cvsTop]);
+            ctx.lineTo(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop);
             break;
          case "circle": clearCanvas(); ctx.beginPath(); ctx.arc(initX, initY, distE(initE, mouseEvt), 0, 2*Math.PI); break;
          case "rect": clearCanvas(); break;
@@ -112,7 +118,7 @@ function updateDrawing(mouseEvt) {
          default: break;
       }
       ctx.stroke();
-      //console.log(mouseEvt.offsetX, mouseEvt.offsetY)
+      console.log(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop)
    }
 }
 
@@ -125,7 +131,7 @@ function cancelDrawing(mouseEvt) {
 
 function finishDrawing(mouseEvt) { 
    if (drawing){ 
-      dataPts.push([mouseEvt.offsetX, mouseEvt.offsetY]);
+      dataPts.push([mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop]);
       redraw(currentTool, dataPts);
    }
    ctx.closePath();

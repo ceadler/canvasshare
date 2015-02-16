@@ -1,4 +1,5 @@
-./sessions
-./private
-./uploads
-./databases
+sessions
+private
+uploads
+databases
+errors

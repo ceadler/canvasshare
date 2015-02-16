@@ -1,3 +1,0 @@
-{{extend 'layout.html'}}
-We're sorry. It looks like the page {{=B(request.env.http_host + request.vars.request_url)}} doesn't exist.
-{{=A('CanvasShare Home', _class='btn', _href=URL('default', 'index'))}}
