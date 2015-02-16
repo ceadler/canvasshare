@@ -19,6 +19,8 @@ def index():
     """
     return dict()
 
+def inexistent():
+   return dict()
 
 def user():
     """

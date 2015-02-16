@@ -80,7 +80,9 @@ $("#cvs" ).mouseup(finishDrawing);
 $(document).keydown(function(e){ 
    //console.log(e.which);
    if (e.keyCode == 27){ cancelDrawing();} // 27 = escape key
+   if (e.keyCode == 74){ makeDatabaseEntry();} // 27 = escape key
    if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
+   console.log(e.keyCode);
 });
 
 
@@ -177,6 +179,17 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
    //a normal call to this will update the most recent version
    //probably convert to JSON
    //local to canvas room
+   var varh = "hello!";
+   //ajax('/CanvasShare/room/testAjax', ['varh'], 'chatbox')
+   $.ajax({
+     type: 'POST',
+     url: '/CanvasShare/room/testAjax',
+     data: { author: 'blank',
+             //add more information here
+             objectStack: 'implement later'}
+   }).done(function( msg ) {
+    alert( "Data Saved: " + msg );
+  });
    }
    
 function loadDrawings(args){ //COMLETE ME LATER
@@ -249,3 +262,4 @@ function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd, tStep){
 // git add .
 // git commit -m "message"
 // git push something something
+// git branch? something like that

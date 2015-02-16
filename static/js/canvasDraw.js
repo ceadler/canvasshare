@@ -28,8 +28,8 @@ BGctx.fillRect(0, 0, BGcanvas.width, BGcanvas.height);
 var canvasObjects = new Array(0);
 var tools = new Array("freehand", "circle", "rect", "line", "text", "elipse");
 var currentTool = tools[1];
-var toolPts = new Array(0);
-var initX = 0; // just a smaller name for toolPts[0][0] and toolPts [0][1]
+var dataPts = new Array(0);
+var initX = 0; // just a smaller name for dataPts[0][0] and dataPts [0][1]
 var initY = 0;
 var initE;
 var drawing = false // a boolean that determines if things are currently being drawn
@@ -80,7 +80,9 @@ $("#cvs" ).mouseup(finishDrawing);
 $(document).keydown(function(e){ 
    //console.log(e.which);
    if (e.keyCode == 27){ cancelDrawing();} // 27 = escape key
+   if (e.keyCode == 74){ makeDatabaseEntry();} // 27 = escape key
    if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
+   console.log(e.keyCode);
 });
 
 
@@ -94,14 +96,14 @@ function startDrawing(mouseEvt){
    initY = mouseEvt.offsetY;
    ctx.moveTo(initX, initY); 
    ctx.beginPath();
-   toolPts.push([initX, initY]); //put this point as the initial point in the array
+   dataPts.push([initX, initY]); //put this point as the initial point in the array
 }
 
 function updateDrawing(mouseEvt) {
    if (drawing){
       switch(currentTool){
          case "freehand": 
-            toolPts.push([mouseEvt.offsetX, mouseEvt.offsetY]);
+            dataPts.push([mouseEvt.offsetX, mouseEvt.offsetY]);
             ctx.lineTo(mouseEvt.offsetX, mouseEvt.offsetY);
             break;
          case "circle": clearCanvas(); ctx.beginPath(); ctx.arc(initX, initY, distE(initE, mouseEvt), 0, 2*Math.PI); break;
@@ -115,7 +117,7 @@ function updateDrawing(mouseEvt) {
 }
 
 function cancelDrawing(mouseEvt) {
-   while(toolPts.length > 0) {toolPts.pop();}
+   while(dataPts.length > 0) {dataPts.pop();}
    drawing = false;
    ctx.closePath();
    clearCanvas();
@@ -123,12 +125,12 @@ function cancelDrawing(mouseEvt) {
 
 function finishDrawing(mouseEvt) { 
    if (drawing){ 
-      toolPts.push([mouseEvt.offsetX, mouseEvt.offsetY]);
-      redraw(currentTool, toolPts);
+      dataPts.push([mouseEvt.offsetX, mouseEvt.offsetY]);
+      redraw(currentTool, dataPts);
    }
    ctx.closePath();
    clearCanvas();
-   while(toolPts.length > 0) {toolPts.pop();}
+   while(dataPts.length > 0) {dataPts.pop();}
    drawing = false;
 }
 
@@ -177,6 +179,17 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
    //a normal call to this will update the most recent version
    //probably convert to JSON
    //local to canvas room
+   var varh = "hello!";
+   //ajax('/CanvasShare/room/testAjax', ['varh'], 'chatbox')
+   $.ajax({
+     type: 'POST',
+     url: '/CanvasShare/room/testAjax',
+     data: { author: 'blank',
+             //add more information here
+             objectStack: 'implement later'}
+   }).done(function( msg ) {
+    alert( "Data Saved: " + msg );
+  });
    }
    
 function loadDrawings(args){ //COMLETE ME LATER
