@@ -1,1 +1,5 @@
 ./sessions
+./private
+./uploads
+./databases
+./errors
