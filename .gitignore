@@ -1,5 +1,5 @@
-./sessions
-./private
-./uploads
-./databases
-./errors
+./sessions/*
+./private/*
+./uploads/*
+./databases/*
+./errors/*
