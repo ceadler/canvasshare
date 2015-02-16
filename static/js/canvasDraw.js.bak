@@ -202,8 +202,11 @@ function changeTool(toolNum){
    });
 }
 
-function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd){
-   for
+function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd, tStep){
+   for(var t = tStart; t < tEnd; t += tStep){
+      //lineTo(xFunc(t), yFunc(t));
+   };
+}
 
 //OTHER IDEAS / TO DO
 // - !points as a class
@@ -239,3 +242,10 @@ function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd){
 
 //GENERAL
 // - get everyone on the github
+
+//GIT COMMANDS
+// git init
+// git remote add <url>
+// git add .
+// git commit -m "message"
+// git push something something

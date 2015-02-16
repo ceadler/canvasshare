@@ -242,3 +242,11 @@ function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd, tStep){
 
 //GENERAL
 // - get everyone on the github
+
+//GIT COMMANDS
+// git init
+// git remote add <url>
+// git add .
+// git commit -m "message"
+// git push something something
+// git branch? something like that
