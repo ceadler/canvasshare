@@ -3,10 +3,8 @@ var canvas = document.getElementById("cvs")
 var BGcanvas = document.getElementById("BGcvs")
 var canvasContainer = canvas.parentNode;
 var boundingRect = canvasContainer.getBoundingClientRect();
-var ctx = canvas.getContext('2d')
-var BGctx = BGcanvas.getContext('2d')
 
-canvas.onselectstart = function () { return false; }
+canvas.onselectstart = function () { return false; } // makes the canvas itself unselectable
 BGcanvas.onselectstart = function () { return false; }
 
 canvas.position = BGcanvas.position = "absolute";
@@ -19,6 +17,8 @@ BGcanvas.width = canvas.width;
 BGcanvas.height = canvas.height;
 
 //CONTEXT SETUP
+var ctx = canvas.getContext('2d')
+var BGctx = BGcanvas.getContext('2d')
 ctx.strokeStyle = "black";
 BGctx.strokeStyle = "red";
 BGctx.fillStyle = "#fff";
@@ -29,14 +29,15 @@ var canvasObjects = new Array(0);
 var tools = new Array("freehand", "circle", "rect", "line", "text", "elipse");
 var currentTool = tools[1];
 var toolPts = new Array(0);
-var initX = 0;
+var initX = 0; // just a smaller name for toolPts[0][0] and toolPts [0][1]
 var initY = 0;
 var initE;
-var drawing = false
+var drawing = false // a boolean that determines if things are currently being drawn
 
 
 //HELPER FUNCTIONS
-function clearSelection() {
+function clearSelection() { //clears the selection of any text. Having text
+                            //selected gets in the way of drawing interactivity
     if (window.getSelection) window.getSelection().removeAllRanges();
     else if (document.selection) document.selection.empty();
 }
@@ -45,7 +46,8 @@ function clearCanvas() {ctx.clearRect(0, 0, canvas.width, canvas.height);}
 function distE(e1, e2) {return Math.sqrt(Math.pow(e1.offsetX-e2.offsetX,2) + Math.pow(e1.offsetY-e2.offsetY,2));}
 function dist(x1, y1, x2, y2) { return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2))}
 
-function addToolBtn(toolNum){
+function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically generated) 
+                              // Still need to work on getting images from a spritesheet
    var toolStr = toolNum.toString();
    var elementName = "toolBtn"+toolStr; //the ID of our new image
    
@@ -108,6 +110,7 @@ function updateDrawing(mouseEvt) {
          default: break;
       }
       ctx.stroke();
+      //console.log(mouseEvt.offsetX, mouseEvt.offsetY)
    }
 }
 
@@ -115,16 +118,16 @@ function cancelDrawing(mouseEvt) {
    while(toolPts.length > 0) {toolPts.pop();}
    drawing = false;
    ctx.closePath();
-   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   clearCanvas();
 }
 
 function finishDrawing(mouseEvt) { 
    if (drawing){ 
       toolPts.push([mouseEvt.offsetX, mouseEvt.offsetY]);
-      redraw(currentTool, toolPts)
+      redraw(currentTool, toolPts);
    }
    ctx.closePath();
-   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   clearCanvas();
    while(toolPts.length > 0) {toolPts.pop();}
    drawing = false;
 }
@@ -199,6 +202,9 @@ function changeTool(toolNum){
    });
 }
 
+function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd){
+   for
+
 //OTHER IDEAS / TO DO
 // - !points as a class
 //     -redefine dist() function 
@@ -207,12 +213,12 @@ function changeTool(toolNum){
 // - !basic database interaction
 // - !absolute coordinates
 // - !work on making tools work (rects, lines, text, elipses)
+// - !Find out how to push updates to the user
 
 // - Make a list of images of tools as HTML elements 
 //   and when you click on one, it switches to that tool
 //   (and alters image to reflect choice?)
 // - work on loading button images from sprite sheets instead of individually by button
-// - Find out how to push updates to the user
 // - Work on the chat box (different JS file though)
 // - work on snapshots
 // - personalized rooms
@@ -226,3 +232,10 @@ function changeTool(toolNum){
 // - allow users to upload their custom background images
 // - ctrl+z to undo last change
 // - esc to cancel drawing
+// - customizable cursor
+// - guidelines for cursor
+
+// - some kind of nice border for the canvas element
+
+//GENERAL
+// - get everyone on the github

@@ -19,8 +19,6 @@ document.body.style.background ="#1a1a1a";
 </div>
    <div class="span3" >
       <p style="color:white"> this is a chat box! </p>
-      {{=IMG(_src=URL('static', 'images/btn1out.png'), _id='toolbtnX')}}
-      {{=IMG(_src=URL('static', 'images/btn2out.png'), _id='toolbtnY')}}
    </div>
 </div>
 
