@@ -210,7 +210,7 @@ function changeImage(object, toolNum, isOver){
    return (function(mouseEvent){
       overState = (isOver? "over" : "out");
       toolStr = toolNum.toString();
-      object.attr('src', "/CanvasShare/static/images/btn" + toolStr + overState + ".png");
+      object.attr('src', "../../static/images/btn" + toolStr + overState + ".png");
       //console.log("Changing image:", object, overState, toolStr);
    });
 }
