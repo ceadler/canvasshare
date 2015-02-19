@@ -228,7 +228,9 @@ function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd, tStep){
 }
 
 // Points Class Prototype Code
-// Here's the points class, not sure where you would like to implement this yet.
+// Here's the points class, not sure where you would like us to implement this
+// or which methods will be needed other than the distance functions.
+
 /*
 
 function Point(x, y){
