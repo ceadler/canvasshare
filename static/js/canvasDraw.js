@@ -214,7 +214,7 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
    //ajax('/CanvasShare/room/testAjax', ['varh'], 'chatbox')
    $.ajax({
      type: 'POST',
-     url: '/CanvasShare/room/testAjax',
+     url: '/'+app_name+'/room/testAjax',
      data: { author: 'blank',
              //add more information here
              objectStack: 'implement later'}
@@ -222,7 +222,7 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
     alert( "Data Saved: " + msg );
   });
    }
-   
+console.log("Here's your aplication name!", app_name);
 function loadDrawings(args){ //COMLETE ME LATER
    //loads old drawings from the database somehow, or refreshes a list of them
 ;}
@@ -235,7 +235,7 @@ function changeImage(object, toolNum, isOver){
    return (function(mouseEvent){
       overState = (isOver? "over" : "out");
       toolStr = toolNum.toString();
-      object.attr('src', "../../static/images/btn" + toolStr + overState + ".png");
+      object.attr('src', '/'+app_name+'/static/images/btn' + toolStr + overState + '.png');
       //console.log("Changing image:", object, overState, toolStr);
    });
 }
