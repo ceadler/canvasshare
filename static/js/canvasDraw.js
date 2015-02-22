@@ -108,13 +108,27 @@ function startDrawing(mouseEvt){
 function updateDrawing(mouseEvt) {
    if (drawing){
       switch(currentTool){
-         case "freehand": 
+         case "freehand":
             dataPts.push([mouseEvt.pageX- cvsLeft, mouseEvt.pageY- cvsTop]);
             ctx.lineTo(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop);
             break;
-         case "circle": clearCanvas(); ctx.beginPath(); ctx.arc(initX, initY, distE(initE, mouseEvt), 0, 2*Math.PI); break;
-         case "rect": clearCanvas(); break;
-         case "line": clearCanvas(); break;
+         case "circle":
+            clearCanvas();
+            ctx.beginPath();
+            ctx.arc(initX, initY, distE(initE, mouseEvt), 0, 2*Math.PI);
+            break;
+         case "rect":
+            clearCanvas();
+            ctx.beginPath();
+            ctx.rect(initX, initY, mouseEvt.pageX - cvsLeft - initX, mouseEvt.pageY - cvsTop - initY);
+            break;
+         case "line":
+            clearCanvas();
+            ctx.beginPath();
+            ctx.moveTo(initX, initY);
+            ctx.lineTo(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop);
+            ctx.stroke();
+            break;
          default: break;
       }
       ctx.stroke();
@@ -129,8 +143,8 @@ function cancelDrawing(mouseEvt) {
    clearCanvas();
 }
 
-function finishDrawing(mouseEvt) { 
-   if (drawing){ 
+function finishDrawing(mouseEvt) {
+   if (drawing){
       dataPts.push([mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop]);
       redraw(currentTool, dataPts);
    }
@@ -159,14 +173,25 @@ function redraw(tool, pts, strokeColor, fillColor, strokeSize){
             BGctx.closePath();
             break;
          case "circle":
-            BGctx.beginPath(); 
-            BGctx.arc(pts[0][0], pts[0][1], 
+            BGctx.beginPath();
+            BGctx.arc(pts[0][0], pts[0][1],
                       dist(pts[0][0], pts[0][1], pts[1][0], pts[1][1]),
-                      0, 2*Math.PI); 
+                      0, 2*Math.PI);
             BGctx.stroke();
             break;
-         case "rect": break;
-         case "line": break;
+         case "rect":
+            BGctx.beginPath();
+            BGctx.rect(pts[0][0], pts[0][1],
+                       pts[1][0]-pts[0][0],
+                       pts[1][1]-pts[0][1]);
+            BGctx.stroke();
+            break;
+         case "line":
+            BGctx.beginPath();
+            BGctx.moveTo(pts[0][0], pts[0][1]);
+            BGctx.lineTo(pts[1][0], pts[1][1]);
+            BGctx.stroke();
+            break;
          default: break;
       }
    }
