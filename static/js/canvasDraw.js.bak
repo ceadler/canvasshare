@@ -6,7 +6,7 @@ var boundingRect = canvasContainer.getBoundingClientRect();
 
 canvas.onselectstart = function () { return false; } // makes the canvas itself unselectable
 BGcanvas.onselectstart = function () { return false; }
-document.onselectstart = function () { if(drawing){return false;} }
+document.onselectstart = function () { if(isDrawing){return false;} }
 
 canvas.position = BGcanvas.position = "absolute";
 canvas.style.left = BGcanvas.style.left = boundingRect.left;
@@ -30,14 +30,18 @@ var canvasObjects = new Array(0);
 var tools = new Array("freehand", "circle", "rect", "line", "text", "elipse");
 var currentTool = tools[1];
 var dataPts = new Array(0);
-var initX = 0; // just a smaller name for dataPts[0][0] and dataPts [0][1]
-var initY = 0;
-var initE;
+var initPt = new Point();
+var initEvt;
 var cvsLeft =  $('#cvs').offset().left //updated every time we start drawing
 var cvsTop =  $('#cvs').offset().top
 console.log(cvsLeft, cvsTop);
-var drawing = false // a boolean that determines if things are currently being drawn
+var isDrawing = false // a boolean that determines if things are currently being drawn
 
+//CLASSES
+function Point(x, y){
+	this.x = x || 0;
+	this.y = y || 0;
+};
 
 //HELPER FUNCTIONS
 function clearSelection() { //clears the selection of any text. Having text
@@ -47,8 +51,9 @@ function clearSelection() { //clears the selection of any text. Having text
 }
 
 function clearCanvas() {ctx.clearRect(0, 0, canvas.width, canvas.height);}
-function distE(e1, e2) {return Math.sqrt(Math.pow(e1.pageX-e2.pageX,2) + Math.pow(e1.pageY-e2.pageY,2));}
-function dist(x1, y1, x2, y2) { return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2))}
+//function distE(e1, e2) {return Math.sqrt(Math.pow(e1.pageX-e2.pageX,2) + Math.pow(e1.pageY-e2.pageY,2));}
+//function dist(x1, y1, x2, y2) { return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2))}
+function distPt(p1, p2) { return Math.sqrt(Math.pow(p1.x-p2.x, 2) + Math.pow(p1.y-p2.y, 2))}
 
 function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically generated) 
                               // Still need to work on getting images from a spritesheet
@@ -73,6 +78,8 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
 for (t in tools){
    addToolBtn((t-1)+2);
 }
+var myFirstPoint = new Point();
+console.log(myFirstPoint.x, myFirstPoint.y, "These are the coords to my point.");
 
 //MOUSE LISTENERS
 $("#cvs").mousedown(startDrawing);
@@ -94,64 +101,71 @@ $(document).keydown(function(e){
 function startDrawing(mouseEvt){
    clearSelection(); //deselects any selected text (Makes it feel more responsive)
    clearCanvas(); 
-   drawing = true; //bool to start drawing
-   initE = mouseEvt;
+   isDrawing = true; //bool to start drawing
+   initEvt = mouseEvt;
    cvsLeft =  $('#cvs').offset().left
    cvsTop =  $('#cvs').offset().top
-   initX = mouseEvt.pageX - cvsLeft;
-   initY = mouseEvt.pageY - cvsTop;
-   ctx.moveTo(initX, initY); 
+   initPt.x = mouseEvt.pageX - cvsLeft;
+   initPt.y = mouseEvt.pageY - cvsTop;
+   ctx.moveTo(initPt.x, initPt.y); 
    ctx.beginPath();
-   dataPts.push([initX, initY]); //put this point as the initial point in the array
+   dataPts.push(initPt); //put this point as the initial point in the array
 }
 
 function updateDrawing(mouseEvt) {
-   if (drawing){
+   if (isDrawing){
+      var here = new Point();
+      here.x = mouseEvt.pageX - cvsLeft;
+      here.y = mouseEvt.pageY - cvsTop;
       switch(currentTool){
          case "freehand":
-            dataPts.push([mouseEvt.pageX- cvsLeft, mouseEvt.pageY- cvsTop]);
-            ctx.lineTo(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop);
+            dataPts.push(here);
+            ctx.lineTo(here.x, here.y);
             break;
          case "circle":
             clearCanvas();
             ctx.beginPath();
-            ctx.arc(initX, initY, distE(initE, mouseEvt), 0, 2*Math.PI);
+            ctx.arc(initPt.x, initPt.y, distPt(initPt, here), 0, 2*Math.PI);
             break;
          case "rect":
             clearCanvas();
             ctx.beginPath();
-            ctx.rect(initX, initY, mouseEvt.pageX - cvsLeft - initX, mouseEvt.pageY - cvsTop - initY);
+            ctx.rect(initPt.x, initPt.y, here.x - initPt.x, here.y - initPt.y);
             break;
          case "line":
             clearCanvas();
             ctx.beginPath();
-            ctx.moveTo(initX, initY);
-            ctx.lineTo(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop);
+            ctx.moveTo(initPt.x, initPt.y);
+            ctx.lineTo(here.x, here.y);
             ctx.stroke();
             break;
          default: break;
       }
       ctx.stroke();
-      console.log(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop)
+      //console.log(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop)
    }
 }
 
 function cancelDrawing(mouseEvt) {
    while(dataPts.length > 0) {dataPts.pop();}
-   drawing = false;
+   isDrawing = false;
    ctx.closePath();
    clearCanvas();
 }
 
 function finishDrawing(mouseEvt) {
-   if (drawing){
-      dataPts.push([mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop]);
+   if (isDrawing){
+      var here = new Point();
+      here.x = mouseEvt.pageX - cvsLeft;
+      here.y = mouseEvt.pageY - cvsTop;
+      dataPts.push(here);
+      var drawing = null;
       redraw(currentTool, dataPts);
    }
    ctx.closePath();
    clearCanvas();
    while(dataPts.length > 0) {dataPts.pop();}
-   drawing = false;
+   isDrawing = false;
 }
 
 //function redraw(drawing){//Later implementation
@@ -164,32 +178,30 @@ function redraw(tool, pts, strokeColor, fillColor, strokeSize){
       switch(tool){
          case "freehand":
             BGctx.beginPath();
-            BGctx.moveTo(pts[0][0], pts[0][1]);
+            BGctx.moveTo(pts[0].x, pts[0].y);
             for (p in pts){
                //console.log("drawing:", pts[p][0], pts[p][1]); //WORK ON CHANGING THIS NOTATION BY MAKING A POINT CLASS
-               BGctx.lineTo(pts[p][0], pts[p][1]);
+               BGctx.lineTo(pts[p].x, pts[p].y);
             }
             BGctx.stroke();
             BGctx.closePath();
             break;
          case "circle":
             BGctx.beginPath();
-            BGctx.arc(pts[0][0], pts[0][1],
-                      dist(pts[0][0], pts[0][1], pts[1][0], pts[1][1]),
+            BGctx.arc(pts[0].x, pts[0].y,
+                      distPt(pts[0], pts[1]),
                       0, 2*Math.PI);
             BGctx.stroke();
             break;
          case "rect":
             BGctx.beginPath();
-            BGctx.rect(pts[0][0], pts[0][1],
-                       pts[1][0]-pts[0][0],
-                       pts[1][1]-pts[0][1]);
+            BGctx.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
             BGctx.stroke();
             break;
          case "line":
             BGctx.beginPath();
-            BGctx.moveTo(pts[0][0], pts[0][1]);
-            BGctx.lineTo(pts[1][0], pts[1][1]);
+            BGctx.moveTo(pts[0].x, pts[0].y);
+            BGctx.lineTo(pts[1].x, pts[1].y);
             BGctx.stroke();
             break;
          default: break;
@@ -214,7 +226,7 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
    //ajax('/CanvasShare/room/testAjax', ['varh'], 'chatbox')
    $.ajax({
      type: 'POST',
-     url: '/CanvasShare/room/testAjax',
+     url: '/'+app_name+'/room/testAjax',
      data: { author: 'blank',
              //add more information here
              objectStack: 'implement later'}
@@ -222,7 +234,6 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
     alert( "Data Saved: " + msg );
   });
    }
-   
 function loadDrawings(args){ //COMLETE ME LATER
    //loads old drawings from the database somehow, or refreshes a list of them
 ;}
@@ -235,7 +246,7 @@ function changeImage(object, toolNum, isOver){
    return (function(mouseEvent){
       overState = (isOver? "over" : "out");
       toolStr = toolNum.toString();
-      object.attr('src', "../../static/images/btn" + toolStr + overState + ".png");
+      object.attr('src', '/'+app_name+'/static/images/btn' + toolStr + overState + '.png');
       //console.log("Changing image:", object, overState, toolStr);
    });
 }
