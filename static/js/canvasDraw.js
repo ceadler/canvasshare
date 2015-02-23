@@ -43,12 +43,12 @@ function Point(x, y){
 	this.y = y || 0;
 };
 
-function drawing(tool, points, strokecolor, fillcolor, strokesize){
+function drawing(tool, points, strokeColor, fillColor, strokeSize){
 this.tool = tool; 
 this.points = points;
-this.stokecolor = strokecolor;
-this.fillcolor = fillcolor;
-this.stokesize = strokesize;
+this.stokeColor = strokeColor;
+this.fillColor = fillColor;
+this.stokeSize = strokeSize;
 };
 
 
@@ -150,6 +150,13 @@ function updateDrawing(mouseEvt) {
             ctx.lineTo(here.x, here.y);
             ctx.stroke();
             break;
+         case "elipse":
+            clearCanvas();
+            ctx.beginPath();
+            ctx.moveTo(initPt.x, initPt.y + (here.y - initPt.y) / 2);
+            ctx.bezierCurveTo(initPt.x, initPt.y, here.x, initPt.y, here.x, initPt.y + (here.y - initPt.y) / 2);
+            ctx.bezierCurveTo(here.x, here.y, initPt.x, here.y, initPt.x, initPt.y + (here.y - initPt.y) / 2);
+            break;
          default: break;
       }
       ctx.stroke();
@@ -194,27 +201,31 @@ function redraw(tool, pts, strokeColor, fillColor, strokeSize){
                //console.log("drawing:", pts[p][0], pts[p][1]); //WORK ON CHANGING THIS NOTATION BY MAKING A POINT CLASS
                BGctx.lineTo(pts[p].x, pts[p].y);
             }
-            BGctx.stroke();
-            BGctx.closePath();
             break;
          case "circle":
             BGctx.beginPath();
             BGctx.arc(pts[0].x, pts[0].y, distPt(pts[0], pts[1]), 0, 2*Math.PI);
-            BGctx.stroke();
             break;
          case "rect":
             BGctx.beginPath();
             BGctx.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
-            BGctx.stroke();
             break;
          case "line":
             BGctx.beginPath();
             BGctx.moveTo(pts[0].x, pts[0].y);
             BGctx.lineTo(pts[1].x, pts[1].y);
-            BGctx.stroke();
+            break;
+         case "elipse":
+            clearCanvas();
+            BGctx.beginPath();
+            BGctx.moveTo(pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
+            BGctx.bezierCurveTo(pts[0].x, pts[0].y, pts[1].x, pts[0].y, pts[1].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
+            BGctx.bezierCurveTo(pts[1].x, pts[1].y, pts[0].x, pts[1].y, pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
             break;
          default: break;
       }
+      BGctx.stroke();
+      BGctx.closePath();
    }
 };
 
