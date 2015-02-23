@@ -43,6 +43,17 @@ function Point(x, y){
 	this.y = y || 0;
 };
 
+function drawing(tool, points, strokecolor, fillcolor, strokesize){
+this.tool = tool; 
+this.points = points;
+stokecolor = strokecolor;
+fillcolor = fillcolor;
+stokesize = strokesize;
+};
+
+
+
+
 //HELPER FUNCTIONS
 function clearSelection() { //clears the selection of any text. Having text
                             //selected gets in the way of drawing interactivity
