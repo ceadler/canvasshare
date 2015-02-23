@@ -46,9 +46,9 @@ function Point(x, y){
 function drawing(tool, points, strokecolor, fillcolor, strokesize){
 this.tool = tool; 
 this.points = points;
-stokecolor = strokecolor;
-fillcolor = fillcolor;
-stokesize = strokesize;
+this.stokecolor = strokecolor;
+this.fillcolor = fillcolor;
+this.stokesize = strokesize;
 };
 
 
