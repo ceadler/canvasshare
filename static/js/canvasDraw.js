@@ -173,11 +173,11 @@ function updateDrawing(mouseEvt) {
          ctx.lineTo(here.x, here.y);
          ctx.stroke();
          break;
-         case "text":
+         /*case "text":
          clearCanvas(ctx);
          ctx.font = "36px serif";
          ctx.fillText(window.prompt("sometext","defaultText"), here.x, here.y);
-         break;
+         break;*/
          case "ellipse":
          clearCanvas(ctx);
          ctx.beginPath();
@@ -247,10 +247,11 @@ function redraw(drawing){//Later implementation
          BGctx.moveTo(pts[0].x, pts[0].y);
          BGctx.lineTo(pts[1].x, pts[1].y);
          break;
-         case "text":
+         /*case "text":
          clearCanvas(ctx);
          BGctx.font = "36px serif";
          BGctx.fillText(window.prompt("sometext","defaultText"), pts[0].x, pts[0].y);
+         break;*/
          case "ellipse":
          clearCanvas(ctx);
          BGctx.beginPath();
