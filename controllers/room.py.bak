@@ -18,9 +18,9 @@ def testAjax():
    ajaxAuthor = request.vars.author or 'no param!'
    ajaxData = request.vars.objectStack or 'no param!'
    
-   objs = []
-   objectStack = json.loads(ajaxData)
-   for obj in objectStack:
-      objs.append(unicodeToAscii(obj['tool']))
+   #objs = []
+   #objectStack = json.loads(ajaxData)
+   #for obj in objectStack:
+   #   objs.append(unicodeToAscii(obj['tool']))
    return "Echo: " + ajaxAuthor +';\n'+ajaxData
    

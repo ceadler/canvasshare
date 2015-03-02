@@ -13,8 +13,8 @@ def index():
 def testAjax():
    """a samle ajax call"""
    
-   def unicodeToAscii(str):
-      return unicodedata.normalize('NFKD', str).encode('ascii','ignore')
+   #def unicodeToAscii(str):
+      #return unicodedata.normalize('NFKD', str).encode('ascii','ignore')
    ajaxAuthor = request.vars.author or 'no param!'
    ajaxData = request.vars.objectStack or 'no param!'
    

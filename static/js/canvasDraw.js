@@ -109,6 +109,10 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
 for (t in tools){
    addToolBtn((t-1)+2);
 }
+var textBox = document.createElement('input');
+textBox.setAttribute('id', "textToolBox");
+textBox.setAttribute('style', 'margin-right:3px');
+$('#canvas_toolbar').append(textBox)
 
 //MOUSE LISTENERS
 $("#cvs").mousedown(startDrawing);
@@ -147,44 +151,44 @@ function startDrawing(mouseEvt){
 }
 
 function updateDrawing(mouseEvt) {
-   if (isDrawing){
+   if (isDrawing || currentTool=='text'){
       var here = new Point();
       here.x = mouseEvt.pageX - cvsLeft;
       here.y = mouseEvt.pageY - cvsTop;
       switch(currentTool){
          case "freehand":
-         dataPts.push(here);
-         ctx.lineTo(here.x, here.y);
-         break;
+            dataPts.push(here);
+            ctx.lineTo(here.x, here.y);
+            break;
          case "circle":
-         clearCanvas(ctx);
-         ctx.beginPath();
-         ctx.arc(initPt.x, initPt.y, distPt(initPt, here), 0, 2*Math.PI);
-         break;
+            clearCanvas(ctx);
+            ctx.beginPath();
+            ctx.arc(initPt.x, initPt.y, distPt(initPt, here), 0, 2*Math.PI);
+            break;
          case "rect":
-         clearCanvas(ctx);
-         ctx.beginPath();
-         ctx.rect(initPt.x, initPt.y, here.x - initPt.x, here.y - initPt.y);
-         break;
+            clearCanvas(ctx);
+            ctx.beginPath();
+            ctx.rect(initPt.x, initPt.y, here.x - initPt.x, here.y - initPt.y);
+            break;
          case "line":
-         clearCanvas(ctx);
-         ctx.beginPath();
-         ctx.moveTo(initPt.x, initPt.y);
-         ctx.lineTo(here.x, here.y);
-         ctx.stroke();
-         break;
-         /*case "text":
-         clearCanvas(ctx);
-         ctx.font = "36px serif";
-         ctx.fillText(window.prompt("sometext","defaultText"), here.x, here.y);
-         break;*/
+            clearCanvas(ctx);
+            ctx.beginPath();
+            ctx.moveTo(initPt.x, initPt.y);
+            ctx.lineTo(here.x, here.y);
+            ctx.stroke();
+            break;
+         case "text":
+            clearCanvas(ctx);
+            ctx.font = "36px serif";
+            ctx.fillText($("#textToolBox").val(), here.x, here.y);
+            break;
          case "ellipse":
-         clearCanvas(ctx);
-         ctx.beginPath();
-         ctx.moveTo(initPt.x, initPt.y + (here.y - initPt.y) / 2);
-         ctx.bezierCurveTo(initPt.x, initPt.y, here.x, initPt.y, here.x, initPt.y + (here.y - initPt.y) / 2);
-         ctx.bezierCurveTo(here.x, here.y, initPt.x, here.y, initPt.x, initPt.y + (here.y - initPt.y) / 2);
-         break;
+            clearCanvas(ctx);
+            ctx.beginPath();
+            ctx.moveTo(initPt.x, initPt.y + (here.y - initPt.y) / 2);
+            ctx.bezierCurveTo(initPt.x, initPt.y, here.x, initPt.y, here.x, initPt.y + (here.y - initPt.y) / 2);
+            ctx.bezierCurveTo(here.x, here.y, initPt.x, here.y, initPt.x, initPt.y + (here.y - initPt.y) / 2);
+            break;
          default: break;
       }
       ctx.stroke();
@@ -227,38 +231,41 @@ function redraw(drawing){//Later implementation
    if (pts.length >= 2){
       switch(tool){
          case "freehand":
-         BGctx.beginPath();
-         BGctx.moveTo(pts[0].x, pts[0].y);
-         for (p in pts){
-            //console.log("drawing:", pts[p][0], pts[p][1]); //WORK ON CHANGING THIS NOTATION BY MAKING A POINT CLASS
-            BGctx.lineTo(pts[p].x, pts[p].y);
-         }
-         break;
+            BGctx.beginPath();
+            BGctx.moveTo(pts[0].x, pts[0].y);
+            for (p in pts){
+               //console.log("drawing:", pts[p][0], pts[p][1]); //WORK ON CHANGING THIS NOTATION BY MAKING A POINT CLASS
+               BGctx.lineTo(pts[p].x, pts[p].y);
+            }
+            break;
          case "circle":
-         BGctx.beginPath();
-         BGctx.arc(pts[0].x, pts[0].y, distPt(pts[0], pts[1]), 0, 2*Math.PI);
-         break;
+            BGctx.beginPath();
+            BGctx.arc(pts[0].x, pts[0].y, distPt(pts[0], pts[1]), 0, 2*Math.PI);
+            break;
          case "rect":
-         BGctx.beginPath();
-         BGctx.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
-         break;
+            BGctx.beginPath();
+            BGctx.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
+            break;
          case "line":
-         BGctx.beginPath();
-         BGctx.moveTo(pts[0].x, pts[0].y);
-         BGctx.lineTo(pts[1].x, pts[1].y);
-         break;
-         /*case "text":
-         clearCanvas(ctx);
-         BGctx.font = "36px serif";
-         BGctx.fillText(window.prompt("sometext","defaultText"), pts[0].x, pts[0].y);
-         break;*/
+            BGctx.beginPath();
+            BGctx.moveTo(pts[0].x, pts[0].y);
+            BGctx.lineTo(pts[1].x, pts[1].y);
+            break;
+         case "text":
+            BGctx.fillStyle = "#f00";
+            clearCanvas(ctx);
+            BGctx.beginPath()
+            BGctx.font = "36px serif";
+            BGctx.fillText($("#textToolBox").val(), pts[1].x, pts[1].y);
+            BGctx.fillStyle = "#fff";
+            break;
          case "ellipse":
-         clearCanvas(ctx);
-         BGctx.beginPath();
-         BGctx.moveTo(pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
-         BGctx.bezierCurveTo(pts[0].x, pts[0].y, pts[1].x, pts[0].y, pts[1].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
-         BGctx.bezierCurveTo(pts[1].x, pts[1].y, pts[0].x, pts[1].y, pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
-         break;
+            clearCanvas(ctx);
+            BGctx.beginPath();
+            BGctx.moveTo(pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
+            BGctx.bezierCurveTo(pts[0].x, pts[0].y, pts[1].x, pts[0].y, pts[1].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
+            BGctx.bezierCurveTo(pts[1].x, pts[1].y, pts[0].x, pts[1].y, pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
+            break;
          default: break;
       }
       BGctx.stroke();
@@ -336,13 +343,13 @@ function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd, tStep){
    this.x = x || 0;
    this.y = y || 0;
    };
-function ptCopy(point)
-{
+   function ptCopy(point)
+   {
    var newPoint = new Point();
    newPoint.x = point.x;
    newPoint.y = point.y;
    return newPoint;
-}
+   }
    
    
    Point.prototype.x = null;
