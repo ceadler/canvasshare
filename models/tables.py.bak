@@ -7,5 +7,5 @@ db.define_table('room',
 db.define_table('drawing',
     Field('date_created', 'datetime'),
     Field('roomref', 'reference room'),
-    Field('drawing_stack', 'text'),
+    Field('drawingStack', 'text'),
     )

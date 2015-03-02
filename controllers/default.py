@@ -17,6 +17,8 @@ def index():
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
+    #UPDATE ME
+    #When the user clicks new room, generate new room in database
     return dict()
 
 def inexistent():

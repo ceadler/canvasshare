@@ -56,13 +56,15 @@ function Point(x, y){
 	this.y = y || 0;
 };
 
-function Drawing(tool, points, strokeColor, fillColor, strokeSize){
+function Drawing(tool, points, strokeColor, fillColor, strokeSize, words, textSize){
    //console.log("Making new drawing.", tool, points);
    this.tool = tool || 'none'; 
    this.pts = points || [];
    this.sCol = strokeColor || '#000';
    this.fCol = fillColor || null;
    this.sSiz = strokeSize || 1;
+   this.text = words;
+   this.tSize = textSize;
 };
 
 
@@ -125,8 +127,9 @@ $(document).keydown(function(e){
    //console.log(e.which);
    if (e.keyCode == 27){ cancelDrawing();}              // 27 = escape key
    if (e.keyCode == 82){ redrawStack();}                // 82 = R
-   if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = C
-   if (e.keyCode == 67){ clearCanvas(BGctx);}           // 67 = C
+   if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = P
+   if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
+                         fillBackground(BGctx, "#fff");}           
    if (e.keyCode == 74){ makeDatabaseEntry();}          // 74 = J
    if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
    console.log(e.keyCode);
@@ -209,7 +212,12 @@ function finishDrawing(mouseEvt) {
       here.x = mouseEvt.pageX - cvsLeft;
       here.y = mouseEvt.pageY - cvsTop;
       dataPts.push(here);
-      var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts)/*, thisStrkColor, thisFillColor, strokeThickness*/);
+      if(currentTool == 'text'){
+         var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts), null, null, null, $("#textToolBox").val(), 36);
+      }
+      else{
+         var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts)/*, thisStrkColor, thisFillColor, strokeThickness*/);
+      }
       drawingStack.push(thisDrawing);
       redraw(thisDrawing);
    }
@@ -256,7 +264,7 @@ function redraw(drawing){//Later implementation
             clearCanvas(ctx);
             BGctx.beginPath()
             BGctx.font = "36px serif";
-            BGctx.fillText($("#textToolBox").val(), pts[1].x, pts[1].y);
+            BGctx.fillText(drawing.text, pts[1].x, pts[1].y);
             BGctx.fillStyle = "#fff";
             break;
          case "ellipse":
@@ -300,6 +308,7 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
       data: 
       { 
          author: 'Carl Eadler',
+         room: roomID,
          objectStack: JSON.stringify(drawingStack)
       }
    }).done(function( msg ) {alert( "Data Saved: " + msg );});
