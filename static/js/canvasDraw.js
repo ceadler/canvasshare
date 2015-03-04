@@ -129,7 +129,7 @@ $(document).keydown(function(e){
    if (e.keyCode == 82){ redrawStack();}                // 82 = R
    if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = P
    if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
-                         fillBackground(BGctx, "#fff");}           
+                         fillBackground(BGctx, "#fff");}
    if (e.keyCode == 74){ makeDatabaseEntry();}          // 74 = J
    if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
    console.log(e.keyCode);
@@ -139,7 +139,7 @@ $(document).keydown(function(e){
 //PRIMARY FUNCTIONS
 function startDrawing(mouseEvt){
    clearSelection(); //deselects any selected text (Makes it feel more responsive)
-   clearCanvas(ctx); 
+   clearCanvas(ctx);
    isDrawing = true; //bool to start drawing
    initEvt = mouseEvt;
    cvsLeft =  $('#cvs').offset().left
@@ -158,6 +158,7 @@ function updateDrawing(mouseEvt) {
       var here = new Point();
       here.x = mouseEvt.pageX - cvsLeft;
       here.y = mouseEvt.pageY - cvsTop;
+      ctx.setLineDash([1, 1]);
       switch(currentTool){
          case "freehand":
             dataPts.push(here);
@@ -187,10 +188,9 @@ function updateDrawing(mouseEvt) {
             break;
          case "ellipse":
             clearCanvas(ctx);
-            ctx.beginPath();
-            ctx.moveTo(initPt.x, initPt.y + (here.y - initPt.y) / 2);
-            ctx.bezierCurveTo(initPt.x, initPt.y, here.x, initPt.y, here.x, initPt.y + (here.y - initPt.y) / 2);
-            ctx.bezierCurveTo(here.x, here.y, initPt.x, here.y, initPt.x, initPt.y + (here.y - initPt.y) / 2);
+            drawEllipseFirst(initPt.x, initPt.y, here.x, here.y);
+            ctx.strokeRect(initPt.x, initPt.y, here.x-initPt.x, here.y-initPt.y);
+            ctx.closePath();
             break;
          default: break;
       }
@@ -235,7 +235,7 @@ function redraw(drawing){//Later implementation
    var pts = drawing.pts;
    var tool = drawing.tool;
    //console.log("in redraw!", tool, pts);
-   
+
    if (pts.length >= 2){
       switch(tool){
          case "freehand":
@@ -269,15 +269,12 @@ function redraw(drawing){//Later implementation
             break;
          case "ellipse":
             clearCanvas(ctx);
-            BGctx.beginPath();
-            BGctx.moveTo(pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
-            BGctx.bezierCurveTo(pts[0].x, pts[0].y, pts[1].x, pts[0].y, pts[1].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
-            BGctx.bezierCurveTo(pts[1].x, pts[1].y, pts[0].x, pts[1].y, pts[0].x, pts[0].y + (pts[1].y - pts[0].y) / 2);
+            drawEllipseFinal(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
+            BGctx.closePath();
             break;
          default: break;
       }
       BGctx.stroke();
-      BGctx.closePath();
    }
 };
 
@@ -340,6 +337,46 @@ function paramaterizedDrawing(xFunc, yFunc, tStart, tEnd, tStep){
    for(var t = tStart; t < tEnd; t += tStep){
       //lineTo(xFunc(t), yFunc(t));
    };
+}
+
+// Ellipse Tool Helper Function for ctx
+function drawEllipseFirst(x1, y1, x2, y2) {
+    var radiusX = (x2 - x1) * 0.5,
+        radiusY = (y2 - y1) * 0.5,
+        centerX = x1 + radiusX,
+        centerY = y1 + radiusY,
+        step = 0.01,
+        a = step,
+        pi2 = Math.PI * 2 - step;
+
+    ctx.beginPath();
+    ctx.moveTo(centerX + radiusX * Math.cos(0),
+               centerY + radiusY * Math.sin(0));
+
+    for(; a < pi2; a += step) {
+        ctx.lineTo(centerX + radiusX * Math.cos(a),
+                   centerY + radiusY * Math.sin(a));
+    }
+}
+
+// Ellipse Helper Function for BGctx
+function drawEllipseFinal(x1, y1, x2, y2) {
+    var radiusX = (x2 - x1) * 0.5,
+        radiusY = (y2 - y1) * 0.5,
+        centerX = x1 + radiusX,
+        centerY = y1 + radiusY,
+        step = 0.01,
+        a = step,
+        pi2 = Math.PI * 2 - step;
+
+    BGctx.beginPath();
+    BGctx.moveTo(centerX + radiusX * Math.cos(0),
+               centerY + radiusY * Math.sin(0));
+
+    for(; a < pi2; a += step) {
+        BGctx.lineTo(centerX + radiusX * Math.cos(a),
+                   centerY + radiusY * Math.sin(a));
+    }
 }
 
 // Points Class Prototype Code
