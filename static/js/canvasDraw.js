@@ -313,6 +313,12 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
 }
 
 function clearAndReloadDS(JsonData){
+obj = JSON.parse(JsonData);
+drawingStack.splice(0,drawingStack.length);
+drawingStack= obj;
+}
+
+
 }
 function loadDrawings(args){
    //loads old drawings from the database somehow, or refreshes a list of them
