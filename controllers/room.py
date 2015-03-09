@@ -16,7 +16,11 @@ def getRecent():
    arg = request.args(0) or ''
    ajaxRoom = arg;
    canvasRoom = db(db.room.keyAlphanum == ajaxRoom).select().first();
+   if canvasRoom is None:
+      return ''
    latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
+   if latest_snap is None:
+      return ''
    data = latest_snap.drawing_stack;
    return data
 

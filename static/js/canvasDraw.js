@@ -108,6 +108,10 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
    jQueryElem.mouseleave(changeImage(jQueryElem, toolNum, false));
 }
 
+
+
+
+
 //INIT
 for (t in tools){
    addToolBtn((t-1)+2);
@@ -116,6 +120,15 @@ var textBox = document.createElement('input');
 textBox.setAttribute('id', "textToolBox");
 textBox.setAttribute('style', 'margin-right:3px');
 $('#canvas_toolbar').append(textBox)
+setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
+            redrawStack()})}, 2000)
+   
+   
+   
+   
+   
+   
+   
 
 //MOUSE LISTENERS
 $("#cvs").mousedown(startDrawing);
@@ -287,6 +300,7 @@ function redraw(drawing){//Later implementation
 };
 
 function redrawStack(){
+   //console.log("Starting!")
    //clears the background canvas and redraws every element on the drawing stack
    clearCanvas(BGctx);
    fillBackground(BGctx, '#fff');
@@ -294,6 +308,7 @@ function redrawStack(){
       //console.log("Drawing!", (parseInt(d)+1) +'/'+drawingStack.length);
       redraw(drawingStack[d])
    };
+   //console.log("STOPPING!!!!")
 }
 
 //function makeDatabaseEntry(tool, pts, strokeColor, fillColor, strokeSize){;//COMPLETE ME LATER
@@ -319,13 +334,17 @@ function makeDatabaseEntry(drawings){
    }).done(function( msg ) {/*alert( "Data Saved: " + msg );*/});
 }
 
-function clearAndReloadDS(JsonData){
-obj = JSON.parse(JsonData);
-drawingStack.splice(0,drawingStack.length);
-drawingStack= obj;
+function clearAndReloadDS(jsonData){
+   //console.log("Before!", jsonData)
+   if (jsonData != ''){
+      obj = JSON.parse(jsonData);
+      //console.log("after!")
+      drawingStack.splice(0,drawingStack.length);
+      drawingStack= obj;
+   }
 }
 
-setInterval (
+
 function loadDrawings(callbackFunc){
    //loads old drawings from the database somehow, or refreshes a list of them
    $.ajax(
@@ -333,7 +352,7 @@ function loadDrawings(callbackFunc){
       type: 'GET',
       url: '/'+app_name+'/room/getRecent/'+roomID,
    }).done(callbackFunc);
-;},2000);
+;}
 
 
 
