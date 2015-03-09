@@ -126,7 +126,7 @@ $(document).mouseup(finishDrawing);
 $(document).keydown(function(e){ 
    //console.log(e.which);
    if (e.keyCode == 27){ cancelDrawing();}              // 27 = escape key
-   if (e.keyCode == 82){ redrawStack();}                // 82 = R
+   if (e.keyCode == 82){ redrawStack(); console.log(drawingStack)}                // 82 = R
    if (e.keyCode == 76){ loadDrawings();}                // 76 = L
    if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = P
    if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
@@ -311,14 +311,24 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
       }
    }).done(function( msg ) {alert( "Data Saved: " + msg );});
 }
+
+function clearAndReloadDS(JsonData){
+obj = JSON.parse(JsonData);
+drawingStack.splice(0,drawingStack.length);
+drawingStack= obj;
+}
+
+
 function loadDrawings(args){
    //loads old drawings from the database somehow, or refreshes a list of them
    $.ajax(
    {
       type: 'GET',
       url: '/'+app_name+'/room/getRecent/'+roomID,
-   }).done(function( msg ) {console.log( "Data read: " + msg );});
+   }).done(clearAndReloadDS);
 ;}
+
+
 
 function drawgrid(){//use some global information about the BGctx canvas
    //to draw a grid (squares)

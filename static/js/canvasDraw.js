@@ -319,14 +319,13 @@ drawingStack= obj;
 }
 
 
-}
 function loadDrawings(args){
    //loads old drawings from the database somehow, or refreshes a list of them
    $.ajax(
    {
       type: 'GET',
       url: '/'+app_name+'/room/getRecent/'+roomID,
-   }).done(function( msg ) {console.log( "Data read: " + msg );});
+   }).done(clearAndReloadDS);
 ;}
 
 
