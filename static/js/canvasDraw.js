@@ -35,6 +35,7 @@ BGctx.fillRect(0, 0, BGcanvas.width, BGcanvas.height);
 
 
 //DATA OBJECTS
+var newDrawings = new Array(0);
 var drawingStack = new Array(0);
 var tools = new Array("freehand", "circle", "rect", "line", "text", "ellipse");
 var currentTool = tools[1];
@@ -126,12 +127,12 @@ $(document).mouseup(finishDrawing);
 $(document).keydown(function(e){ 
    //console.log(e.which);
    if (e.keyCode == 27){ cancelDrawing();}              // 27 = escape key
-   if (e.keyCode == 82){ redrawStack();}                // 82 = R
-   if (e.keyCode == 76){ loadDrawings();}                // 76 = L
-   if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = P
-   if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
-                         fillBackground(BGctx, "#fff");}
-   if (e.keyCode == 74){ makeDatabaseEntry();}          // 74 = J
+   //if (e.keyCode == 82){ redrawStack();}                // 82 = R
+   //if (e.keyCode == 76){ loadDrawings();}                // 76 = L
+   //if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = P
+   //if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
+   //                      fillBackground(BGctx, "#fff");}
+   //if (e.keyCode == 74){ makeDatabaseEntry();}          // 74 = J
    if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
    console.log(e.keyCode);
 });
@@ -139,6 +140,9 @@ $(document).keydown(function(e){
 
 //PRIMARY FUNCTIONS
 function startDrawing(mouseEvt){
+   loadDrawings(function(m){clearAndReloadDS(m);
+                            redrawStack();
+                           });
    clearSelection(); //deselects any selected text (Makes it feel more responsive)
    clearCanvas(ctx);
    isDrawing = true; //bool to start drawing
@@ -219,8 +223,11 @@ function finishDrawing(mouseEvt) {
       else{
          var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts)/*, thisStrkColor, thisFillColor, strokeThickness*/);
       }
-      drawingStack.push(thisDrawing);
-      redraw(thisDrawing);
+      loadDrawings(function(m){clearAndReloadDS(m);
+                               drawingStack.push(thisDrawing);
+                               redrawStack();
+                               makeDatabaseEntry(drawingStack);
+                               });
    }
    ctx.closePath();
    clearCanvas(ctx);
@@ -290,7 +297,7 @@ function redrawStack(){
 }
 
 //function makeDatabaseEntry(tool, pts, strokeColor, fillColor, strokeSize){;//COMPLETE ME LATER
-function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
+function makeDatabaseEntry(drawings){
    //drawings should be a list of drawing objects
    //most commonly used via ajax
    //a snapshot will use this, but will create a new 'revision' whereas
@@ -307,9 +314,9 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
       { 
          author: 'Carl Eadler',
          room: roomID,
-         objectStack: JSON.stringify(drawingStack)
+         objectStack: JSON.stringify(drawings)
       }
-   }).done(function( msg ) {alert( "Data Saved: " + msg );});
+   }).done(function( msg ) {/*alert( "Data Saved: " + msg );*/});
 }
 
 function clearAndReloadDS(JsonData){
@@ -319,13 +326,13 @@ drawingStack= obj;
 }
 
 
-function loadDrawings(args){
+function loadDrawings(callbackFunc){
    //loads old drawings from the database somehow, or refreshes a list of them
    $.ajax(
    {
       type: 'GET',
       url: '/'+app_name+'/room/getRecent/'+roomID,
-   }).done(clearAndReloadDS);
+   }).done(callbackFunc);
 ;}
 
 
