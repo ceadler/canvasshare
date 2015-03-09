@@ -127,6 +127,7 @@ $(document).keydown(function(e){
    //console.log(e.which);
    if (e.keyCode == 27){ cancelDrawing();}              // 27 = escape key
    if (e.keyCode == 82){ redrawStack();}                // 82 = R
+   if (e.keyCode == 76){ loadDrawings();}                // 76 = L
    if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = P
    if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
                          fillBackground(BGctx, "#fff");}
@@ -301,7 +302,7 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
    $.ajax(
    {
       type: 'POST',
-      url: '/'+app_name+'/room/testAjax',
+      url: '/'+app_name+'/room/saveRecent',
       data: 
       { 
          author: 'Carl Eadler',
@@ -310,9 +311,19 @@ function makeDatabaseEntry(drawings){;//COMPLETE ME LATER
       }
    }).done(function( msg ) {alert( "Data Saved: " + msg );});
 }
-function loadDrawings(args){ //COMLETE ME LATER
+
+function clearAndReloadDS(JsonData){
+}
+function loadDrawings(args){
    //loads old drawings from the database somehow, or refreshes a list of them
+   $.ajax(
+   {
+      type: 'GET',
+      url: '/'+app_name+'/room/getRecent/'+roomID,
+   }).done(function( msg ) {console.log( "Data read: " + msg );});
 ;}
+
+
 
 function drawgrid(){//use some global information about the BGctx canvas
    //to draw a grid (squares)
