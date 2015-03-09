@@ -325,7 +325,7 @@ drawingStack.splice(0,drawingStack.length);
 drawingStack= obj;
 }
 
-
+setInterval (
 function loadDrawings(callbackFunc){
    //loads old drawings from the database somehow, or refreshes a list of them
    $.ajax(
@@ -333,7 +333,7 @@ function loadDrawings(callbackFunc){
       type: 'GET',
       url: '/'+app_name+'/room/getRecent/'+roomID,
    }).done(callbackFunc);
-;}
+;},2000);
 
 
 
