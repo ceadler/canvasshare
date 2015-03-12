@@ -121,7 +121,7 @@ textBox.setAttribute('id', "textToolBox");
 textBox.setAttribute('style', 'margin-right:3px');
 $('#canvas_toolbar').append(textBox)
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
-            redrawStack()})}, 2000)
+            redrawStack()})}, 1000)
    
    
    
@@ -226,27 +226,21 @@ function cancelDrawing(mouseEvt) {
 
 function finishDrawing(mouseEvt) {
    if (isDrawing){
-      console.log("a");
       var here = new Point();
       here.x = mouseEvt.pageX - cvsLeft;
       here.y = mouseEvt.pageY - cvsTop;
       dataPts.push(here);
-      console.log("b");
       if(currentTool == 'text'){
-      console.log("c");
          var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts), null, null, null, $("#textToolBox").val(), 36);
       }
       else{
-      console.log("d");
          var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts)/*, thisStrkColor, thisFillColor, strokeThickness*/);
       }
-      console.log("e");
       loadDrawings(function(m){clearAndReloadDS(m);
                                drawingStack.push(thisDrawing);
                                redrawStack();
                                makeDatabaseEntry(drawingStack);
                                });
-      console.log("f");
    }
    ctx.closePath();
    clearCanvas(ctx);

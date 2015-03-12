@@ -121,7 +121,7 @@ textBox.setAttribute('id', "textToolBox");
 textBox.setAttribute('style', 'margin-right:3px');
 $('#canvas_toolbar').append(textBox)
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
-            redrawStack()})}, 2000)
+            redrawStack()})}, 1000)
    
    
    
@@ -324,7 +324,7 @@ function makeDatabaseEntry(drawings){
    $.ajax(
    {
       type: 'POST',
-      url: '/'+app_name+'/room/saveRecent',
+      url: '/'+app_name+'/room/saveSnapshot',
       data: 
       { 
          author: 'Carl Eadler',

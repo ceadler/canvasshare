@@ -13,9 +13,10 @@ def index():
    return dict(arg=arg)
    
 def getRecent():
+   '''Gets a copy of the most recent data'''
    arg = request.args(0) or ''
    ajaxRoom = arg;
-   canvasRoom = db(db.room.keyAlphanum == ajaxRoom).select().first();
+   canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
    if canvasRoom is None:
       return ''
    latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
@@ -23,24 +24,41 @@ def getRecent():
       return ''
    data = latest_snap.drawing_stack;
    return data
-
-def saveRecent():
-   """a samle ajax call"""
    
-   #def unicodeToAscii(str):
-      #return unicodedata.normalize('NFKD', str).encode('ascii','ignore')
+   
+   
+   
+def submitData():
+   '''Function for saving a new artifact of data'''
+   ajaxRoom = request.vars.room or '';
+   ajaxData = request.vars.objectStack or 'no param!'   
+   canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
+   
+   if not (ajaxRoom is '' or canvasRoom is None):
+      #return ''#fail silently
+      latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
+      newData = latest_snap.drawing_stack + ajaxData
+      latest_snap.update_record(drawing_stack = ajaxData);
+      #return ''
+   #else:
+   
+   
+   
+   
+def saveSnapshot():
+   '''a samle ajax call'''
    ajaxAuthor = request.vars.author or 'no param!'
    ajaxRoom = request.vars.room or '';
    ajaxData = request.vars.objectStack or 'no param!'   
    
    if ajaxRoom is '':
       return ''#throw some other error instead actually
-   canvasRoom = db(db.room.keyAlphanum == ajaxRoom).select().first();
-   #content = db(db.room.keyAlphanum == ajaxRoom).count();
+   canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
+   #content = db(db.room.roomIdentifier == ajaxRoom).count();
    logger.info(canvasRoom);
    if canvasRoom is None:
       missing = True
-      roomID = db.room.insert(keyAlphanum = ajaxRoom)
+      roomID = db.room.insert(roomIdentifier = ajaxRoom)
       snapID = db.drawing.insert(date_created = datetime.utcnow(),
                          roomref = roomID,
                          drawing_stack = ajaxData,
@@ -67,4 +85,8 @@ def saveRecent():
    #for obj in objectStack:
    #   objs.append(unicodeToAscii(obj['tool']))
    return "Echo: " + repr(content)
+   
+def createRoom():
+   '''an ajax? call for creating a new room'''
+   return ''
    

@@ -1,7 +1,8 @@
 from datetime import datetime
 
 db.define_table('room',
-    Field('keyAlphanum'),
+    Field('roomIdentifier'),
+    Field('isPublic', 'boolean')
     )
     
 db.define_table('drawing',

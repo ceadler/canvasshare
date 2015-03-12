@@ -1,11 +1,12 @@
 from datetime import datetime
 
 db.define_table('room',
-    Field('keyAlphanum'),
+    Field('roomID'),
+    Field('isPublic', 'boolean')
     )
     
 db.define_table('drawing',
     Field('date_created', 'datetime'),
     Field('roomref', 'reference room'),
-    Field('drawingStack', 'text'),
+    Field('drawing_stack', 'text'),
     )
