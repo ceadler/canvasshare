@@ -101,11 +101,11 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
    
    var jQueryElem = $("#"+elementName); //gets the element as a jQuery element
    //so we can use jQUery functions on it
-   changeImage(jQueryElem, toolNum, false)(); //sets default image
-   
+   console.log(jQueryElem);
+   changeToolImage(jQueryElem, toolNum, false)(); //sets default image
    jQueryElem.click(changeTool(toolNum)); //adds listeners for these events
-   jQueryElem.mouseenter(changeImage(jQueryElem, toolNum, true));
-   jQueryElem.mouseleave(changeImage(jQueryElem, toolNum, false));
+   jQueryElem.mouseenter(changeToolImage(jQueryElem, toolNum, true));
+   jQueryElem.mouseleave(changeToolImage(jQueryElem, toolNum, false));
 }
 
 
@@ -360,18 +360,28 @@ function drawgrid(){//use some global information about the BGctx canvas
    //to draw a grid (squares)
 ;}
 
-function changeImage(object, toolNum, isOver){
+function changeToolImage(tool, toolNum, isOver){
    return (function(mouseEvent){
-      overState = (isOver? "over" : "out");
-      toolStr = toolNum.toString();
-      object.attr('src', '/'+app_name+'/static/images/btn' + toolStr + overState + '.png');
-      //console.log("Changing image:", object, overState, toolStr);
+      if(currentTool != tools[toolNum-1]){
+         //Don't change the image if it's the one we're using.
+         overState = (isOver? "over" : "out");
+         toolStr = toolNum.toString();
+         tool.attr('src', '/'+app_name+'/static/images/btn' + toolStr + overState + '.png');
+      }
+      else{
+         toolStr = toolNum.toString();
+         tool.attr('src', '/'+app_name+'/static/images/btn' + toolStr + 'sel.png');
+      }
    });
 }
 
 function changeTool(toolNum){
+   changeToolImage($("#toolBtn"+toolNum.toString()), toolNum);
    return (function(mouseEvent){
+      var thisToolID = (tools.indexOf(currentTool))+1;
       currentTool = tools[toolNum-1];
+      changeToolImage($("#toolBtn"+thisToolID.toString()), thisToolID, false)();
+      changeToolImage($("#toolBtn"+toolNum.toString()), toolNum)();
    });
 }
 
