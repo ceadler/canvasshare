@@ -114,14 +114,20 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
 
 function makeColorBox(elementName, callback, defaultColor){
    var cBox = document.createElement('div')
-   cBox.setAttribute('id', 'fillColorBox')
-   cBox.setAttribute('style', 'background-color:#'+defaultColor+'; height:28px; width:28px; float:right; margin:1px; border:1px solid white')
+   var check= document.createElement('input')
+   check.setAttribute('type', 'checkbox')
+   check.setAttribute('id', elementName+'_cb')
+   check.setAttribute('style', 'margin:auto; vertical-align:top')
+   check.checked = true;
+   cBox.appendChild(check);
+   cBox.setAttribute('id', elementName)
+   cBox.setAttribute('style', 'background-color:#'+defaultColor+'; height:28px; width:28px; float:right; margin:1px; border:1px solid white; text-align:left')
    $('#canvas_toolbar').append(cBox)
    $(cBox).colpick({
       onSubmit:function(hsb, hex, rgb, element){
          $(element).css('background-color', '#'+hex);
          $(element).colpickHide();
-         callback(hex);
+         callback(hex, function(){return check.checked});
       }
    })
 }
@@ -141,8 +147,8 @@ $('#canvas_toolbar').append(textBox)
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
             redrawStack()})}, 1000)
 
-makeColorBox('fillColorBox', function(hex){fillColor = hex}, fillColor)
-makeColorBox('strokeColorBox', function(hex){strokeColor = hex}, strokeColor)
+makeColorBox('fillColorBox', function(hex, getValue){fillColor = (getValue()? hex:null)}, fillColor)
+makeColorBox('strokeColorBox', function(hex, getValue){strokeColor =(getValue()? hex:null)}, strokeColor)
    
    
    
