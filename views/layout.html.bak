@@ -84,7 +84,7 @@
           {{pass}}
         </ul>
         <ul class="span9" style="margin-left:0; margin-bottom:0; padding:2px">
-            {{=CENTER(A(IMG(_src=URL('static','images/logo2.png'),  _style="height:60px; margin-left:auto; margin-right:auto") 
+            {{=CENTER(A(IMG(_src=URL('static','images/logo2.png'),  _style="height:60px; margin-left:auto; margin-right:auto"), 
                         _href=URL('default', 'index')))}}
         </ul>
         <ul id="navbar" class="span2 nav">
@@ -103,6 +103,10 @@
   <script> var app_name = '{{=request.application}}'</script>
     <!-- Masthead ================================================== -->
     <section id="main" class="main row">
+    <style> @font-face {
+       font-family: SomeFont;
+       src: url({{=URL('static', 'fonts/lobster.otf')}})
+    }</style>
             {{include}}<? Comment: This is where extended pages are inserted?>
     </section><!--/main-->
     </div>

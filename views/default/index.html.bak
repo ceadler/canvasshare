@@ -1,6 +1,8 @@
 {{left_sidebar_disabled=True,right_sidebar_disabled=True,('message' in globals())}}
 {{extend 'layout.html'}}
 <script>document.body.style.background ="#1a1a1a";</script>
+<script src="{{=URL('static', 'js/colpick.js')}}" type="text/javascript"></script>
+<link rel="stylesheet" href="{{=URL('static', 'css/colpick.css')}}" type="text/css"/>
 <div class="span12" style="margin-left:0"> 
    <p style="text-align:center">
       {{=A('Get started with CanvasShare', _class='btn', _href=URL('room', 'index', args=['123141']))}}

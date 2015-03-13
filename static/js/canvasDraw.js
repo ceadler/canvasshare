@@ -46,6 +46,10 @@ var cvsLeft =  $('#cvs').offset().left //updated every time we start drawing
 var cvsTop =  $('#cvs').offset().top
 console.log(cvsLeft, cvsTop);
 var isDrawing = false // a boolean that determines if things are currently being drawn
+var fontStyle = "lobster"
+var fillColor = '0000ff'
+var strokeColor = '0fffff'
+var strokeSize = 1
 
 
 
@@ -57,15 +61,15 @@ function Point(x, y){
 	this.y = y || 0;
 };
 
-function Drawing(tool, points, strokeColor, fillColor, strokeSize, words, textSize){
+function Drawing(tool, points, strokingColor, fillingColor, strokingSize, words, font){
    //console.log("Making new drawing.", tool, points);
    this.tool = tool || 'none'; 
    this.pts = points || [];
-   this.sCol = strokeColor || '#000';
-   this.fCol = fillColor || null;
+   this.sCol = strokingColor || '000000';
+   this.fCol = fillingColor || '000000';
    this.sSiz = strokeSize || 1;
    this.text = words;
-   this.tSize = textSize;
+   this.font = font;
 };
 
 
@@ -108,6 +112,20 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
    jQueryElem.mouseleave(changeToolImage(jQueryElem, toolNum, false));
 }
 
+function makeColorBox(elementName, callback, defaultColor){
+   var cBox = document.createElement('div')
+   cBox.setAttribute('id', 'fillColorBox')
+   cBox.setAttribute('style', 'background-color:#'+defaultColor+'; height:28px; width:28px; float:right; margin:1px; border:1px solid white')
+   $('#canvas_toolbar').append(cBox)
+   $(cBox).colpick({
+      onSubmit:function(hsb, hex, rgb, element){
+         $(element).css('background-color', '#'+hex);
+         $(element).colpickHide();
+         callback(hex);
+      }
+   })
+}
+
 
 
 
@@ -122,6 +140,9 @@ textBox.setAttribute('style', 'margin-right:3px');
 $('#canvas_toolbar').append(textBox)
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
             redrawStack()})}, 1000)
+
+makeColorBox('fillColorBox', function(hex){fillColor = hex}, fillColor)
+makeColorBox('strokeColorBox', function(hex){strokeColor = hex}, strokeColor)
    
    
    
@@ -176,21 +197,24 @@ function updateDrawing(mouseEvt) {
       var here = new Point();
       here.x = mouseEvt.pageX - cvsLeft;
       here.y = mouseEvt.pageY - cvsTop;
-      ctx.setLineDash([1, 1]);
+      //ctx.setLineDash([1, 1]);
       switch(currentTool){
          case "freehand":
             dataPts.push(here);
             ctx.lineTo(here.x, here.y);
+            ctx.stroke();
             break;
          case "circle":
             clearCanvas(ctx);
             ctx.beginPath();
             ctx.arc(initPt.x, initPt.y, distPt(initPt, here), 0, 2*Math.PI);
+            ctx.stroke();
             break;
          case "rect":
             clearCanvas(ctx);
             ctx.beginPath();
             ctx.rect(initPt.x, initPt.y, here.x - initPt.x, here.y - initPt.y);
+            ctx.stroke();
             break;
          case "line":
             clearCanvas(ctx);
@@ -200,19 +224,25 @@ function updateDrawing(mouseEvt) {
             ctx.stroke();
             break;
          case "text":
+            ctx.beginPath();
             clearCanvas(ctx);
-            ctx.font = "36px serif";
-            ctx.fillText($("#textToolBox").val(), here.x, here.y);
+            var textHeight = 36;
+            ctx.font = textHeight + "px "+fontStyle;
+            var textStr = $("#textToolBox").val()
+            ctx.fillText(textStr, here.x, here.y);
+            var textWidth = ctx.measureText(textStr).width;
+            ctx.rect(here.x, here.y, textWidth, -textHeight);
+            ctx.stroke();
             break;
          case "ellipse":
             clearCanvas(ctx);
             drawEllipseFirst(initPt.x, initPt.y, here.x, here.y);
-            ctx.strokeRect(initPt.x, initPt.y, here.x-initPt.x, here.y-initPt.y);
+            //ctx.strokeRect(initPt.x, initPt.y, here.x-initPt.x, here.y-initPt.y);
             ctx.closePath();
+            ctx.stroke();
             break;
          default: break;
       }
-      ctx.stroke();
       //console.log(mouseEvt.pageX - cvsLeft, mouseEvt.pageY - cvsTop)
    }
 }
@@ -230,17 +260,21 @@ function finishDrawing(mouseEvt) {
       here.x = mouseEvt.pageX - cvsLeft;
       here.y = mouseEvt.pageY - cvsTop;
       dataPts.push(here);
-      if(currentTool == 'text'){
-         var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts), null, null, null, $("#textToolBox").val(), 36);
-      }
-      else{
-         var thisDrawing = new Drawing(currentTool, $.extend(true, new Array(0), dataPts)/*, thisStrkColor, thisFillColor, strokeThickness*/);
-      }
-      loadDrawings(function(m){clearAndReloadDS(m);
-                               drawingStack.push(thisDrawing);
-                               redrawStack();
-                               makeDatabaseEntry(drawingStack);
-                               });
+      var thisDrawing = 
+         new Drawing(currentTool, 
+                     $.extend(true, new Array(0), dataPts), 
+                     strokeColor, 
+                     fillColor, 
+                     strokeSize, 
+                     ((currentTool == 'text')? 
+                        $("#textToolBox").val() : ''),
+                     ctx.font);
+      loadDrawings(
+         function(m){clearAndReloadDS(m);
+                     drawingStack.push(thisDrawing);
+                     redrawStack();
+                     makeDatabaseEntry(drawingStack);
+      });
    }
    ctx.closePath();
    clearCanvas(ctx);
@@ -258,6 +292,8 @@ function redraw(drawing){//Later implementation
    //console.log("in redraw!", tool, pts);
 
    if (pts.length >= 2){
+      BGctx.fillStyle = '#'+drawing.fCol;
+      BGctx.strokeStyle = '#'+drawing.sCol;
       switch(tool){
          case "freehand":
             BGctx.beginPath();
@@ -281,12 +317,10 @@ function redraw(drawing){//Later implementation
             BGctx.lineTo(pts[1].x, pts[1].y);
             break;
          case "text":
-            BGctx.fillStyle = "#f00";
-            clearCanvas(ctx);
+            //clearCanvas(ctx);
             BGctx.beginPath()
-            BGctx.font = "36px serif";
+            BGctx.font = drawing.font || '36px serif'
             BGctx.fillText(drawing.text, pts[1].x, pts[1].y);
-            BGctx.fillStyle = "#fff";
             break;
          case "ellipse":
             clearCanvas(ctx);

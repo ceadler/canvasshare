@@ -103,6 +103,10 @@
   <script> var app_name = '{{=request.application}}'</script>
     <!-- Masthead ================================================== -->
     <section id="main" class="main row">
+    <style> @font-face {
+       font-family: lobster;
+       src: url({{=URL('static', 'fonts/lobster.otf')}})
+    }</style>
             {{include}}<? Comment: This is where extended pages are inserted?>
     </section><!--/main-->
     </div>
