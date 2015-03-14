@@ -29,6 +29,10 @@ ctx.lineWidth = 1
 BGctx.strokeStyle = "#f00";
 BGctx.fillStyle = "#fff";
 BGctx.fillRect(0, 0, BGcanvas.width, BGcanvas.height);
+ctx.lineCap='round';
+BGctx.lineCap='round';
+ctx.miterLimit=1;
+BGctx.miterLimit=1;
 
 
 
@@ -120,10 +124,10 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
    jQueryElem.mouseleave(changeToolImage(jQueryElem, toolNum, false));
 }
 
-function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, defaultCheck, text){
+function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, defaultCheck, text, textSize){
    var cBox = document.createElement('div')
    cBox.setAttribute('id', elementName)
-   cBox.setAttribute('style', 'display:table; background-color:#'+defaultColor+'; height:24px; width:24px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle; overflow:hidden')
+   cBox.setAttribute('style', 'display:table; background-color:#'+defaultColor+'; height:24px; width:28px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle; overflow:hidden')
    
    var check= document.createElement('input')
    check.setAttribute('type', 'checkbox')
@@ -134,11 +138,13 @@ function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, d
    cBox.appendChild(check);
    
    var letter = document.createElement('div')
-   letter.setAttribute('style','cursor:default; vertical-align:bottom; display:table-cell; font-size:8px; position:relative; top:6px; margin-left:-2; float:left');
+   letter.setAttribute('style','cursor:default; font-size:'+textSize+'px; position:relative; \
+                                top:7px; margin-left:-1px; float:left');
    letter.innerHTML=text;
    
    var letterbg = document.createElement('div');
-   letterbg.setAttribute('style', 'background-color:white; width:24px; height:8px; position:relative; bottom:-20px; float:left');
+   letterbg.setAttribute('style', 'background-color:white; width:28px; height:8px; \
+                                   position:relative; bottom:-20px; float:left');
    cBox.appendChild(letterbg);
    cBox.appendChild(letter);
    
@@ -152,13 +158,31 @@ function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, d
    })
 }
 
-function makeStrokeSizeBox(elementName, callback, defaultVal){
+function makeStrokeSizeBox(elementName, callback, defaultVal, text, textSize){
+   var cont = document.createElement('div')
+   cont.setAttribute('style', 'height:22px; width:28px; float:left; margin-left:1px')
+   
    var ssb = document.createElement('input')
    ssb.setAttribute('id', elementName)
    $(ssb).val(defaultVal)
    $(ssb).keyup(function(e){callback($(ssb).val())})
-   ssb.setAttribute('style', 'height:22px; width:22px; float:left; margin:1px; border:1px solid gray; text-align:left')
-   $('#canvas_toolbar').append(ssb)
+   ssb.setAttribute('style', 'height:19px; width:26px; position:absolute; \
+                              margin:auto; border:0px; text-align:left;\
+                              vertical-align:top; text-align:right')
+   cont.appendChild(ssb);
+      
+   var letter = document.createElement('div')
+   letter.setAttribute('style','cursor:default; font-size:'+textSize+'px; position:relative; \
+                                top:8px;float:left; margin-left:1-x');
+   letter.innerHTML=text;
+   
+   var letterbg = document.createElement('div');
+   letterbg.setAttribute('style', 'background-color:#fff; width:24px; height:7px; \
+                                   position:relative; top:22px; float:left;\
+                                   border:1px solid #eee');
+   cont.appendChild(letterbg);
+   cont.appendChild(letter);
+   $('#canvas_toolbar').append(cont)
 }
 
 String.prototype.format = function() {
@@ -182,27 +206,29 @@ makeColorBox('fillColorBox',
                 fillEnabled = elem.checked;},
              fillColor,
              fillEnabled,
-             "fill")
+             "Fill", 10)
 makeColorBox('strokeColorBox', 
              function(hex){strokeColor = hex;}, 
              function(elem){console.log('S Changed!');
                 strokeEnabled = elem.checked;},
              strokeColor,
              strokeEnabled,
-             "stroke")
+             "Stroke", 9)
 makeStrokeSizeBox('strokeSizeBox', 
                   function(size){
                      strokeSize = (Math.abs(parseInt(size)) || 1);
                      ctx.lineWidth = strokeSize;
                      console.log(strokeSize, size);
                   }, 
-                  strokeSize)
+                  strokeSize,
+                  "width", 10)
 for (t in tools){
    addToolBtn((t-1)+2);
 }
 var textBox = document.createElement('input');
 textBox.setAttribute('id', "textToolBox");
 textBox.setAttribute('style', 'margin-right:3px');
+textBox.setAttribute('placeholder', 'Insert text here');
 $('#canvas_toolbar').append(textBox)
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
             redrawStack()})}, 1000)
@@ -383,7 +409,6 @@ function redraw(drawing){//Later implementation
          case "rect":
             BGctx.beginPath();
             BGctx.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
-            BGctx.fill();
             break;
          case "line":
             BGctx.beginPath();
@@ -404,8 +429,8 @@ function redraw(drawing){//Later implementation
             break;
          default: break;
       }
-      if(drawing.fE)BGctx.fill();
-      if(drawing.sE)BGctx.stroke();
+      if(drawing.fE){BGctx.closePath(); BGctx.fill();}
+      if(drawing.sE){BGctx.stroke();}
    }
 };
 
