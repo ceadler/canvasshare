@@ -127,19 +127,19 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
 function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, defaultCheck, text, textSize){
    var cBox = document.createElement('div')
    cBox.setAttribute('id', elementName)
-   cBox.setAttribute('style', 'display:table; background-color:#'+defaultColor+'; height:24px; width:28px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle; overflow:hidden')
+   cBox.setAttribute('style', 'display:table; background-color:#'+defaultColor+'; height:24px; width:24px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle; overflow:hidden')
    
    var check= document.createElement('input')
    check.setAttribute('type', 'checkbox')
    check.setAttribute('id', elementName+'_cb')
-   check.setAttribute('style', 'margin:auto; vertical-align:top; position:absolute')
+   check.setAttribute('style', 'margin:0px -12px; vertical-align:top; position:absolute')
    check.checked = defaultCheck;
    $(check).change(function(e){checkCallback(check)})
    cBox.appendChild(check);
    
    var letter = document.createElement('div')
    letter.setAttribute('style','cursor:default; font-size:'+textSize+'px; position:relative; \
-                                top:7px; margin-left:-1px; float:left');
+                                top:5px; margin-left:-1px; float:left');
    letter.innerHTML=text;
    
    var letterbg = document.createElement('div');
@@ -160,26 +160,26 @@ function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, d
 
 function makeStrokeSizeBox(elementName, callback, defaultVal, text, textSize){
    var cont = document.createElement('div')
-   cont.setAttribute('style', 'height:22px; width:28px; float:left; margin-left:1px')
+   cont.setAttribute('style', 'height:22px; width:28px; float:left;')
    
    var ssb = document.createElement('input')
    ssb.setAttribute('id', elementName)
    $(ssb).val(defaultVal)
    $(ssb).keyup(function(e){callback($(ssb).val())})
-   ssb.setAttribute('style', 'height:19px; width:26px; position:absolute; \
-                              margin:auto; border:0px; text-align:left;\
+   ssb.setAttribute('style', 'height:19px; width:26px; position:relative; \
+                              margin:0px 1px; border:0px; text-align:left;\
                               vertical-align:top; text-align:right')
    cont.appendChild(ssb);
       
    var letter = document.createElement('div')
    letter.setAttribute('style','cursor:default; font-size:'+textSize+'px; position:relative; \
-                                top:8px;float:left; margin-left:1px');
+                       top:-15px; margin:0px 1px; text-align:center;');
    letter.innerHTML=text;
    
    var letterbg = document.createElement('div');
-   letterbg.setAttribute('style', 'background-color:#fff; width:24px; height:7px; \
-                                   position:relative; top:22px; float:left;\
-                                   border:1px solid #eee');
+   letterbg.setAttribute('style', 'background-color:#fff; width:26px; height:7px; \
+                                   position:relative; top:0px;\
+                                   border:1px solid #eee; margin:0px 1px;');
    cont.appendChild(letterbg);
    cont.appendChild(letter);
    $('#canvas_toolbar').append(cont)
@@ -219,9 +219,9 @@ makeStrokeSizeBox('strokeSizeBox',
                      strokeSize = (Math.abs(parseInt(size)) || 1);
                      ctx.lineWidth = strokeSize;
                      console.log(strokeSize, size);
-                  }, 
+                  },
                   strokeSize,
-                  "width", 10)
+                  "Width", 10)
 for (t in tools){
    addToolBtn((t-1)+2);
 }
@@ -565,6 +565,16 @@ function drawEllipseFinal(x1, y1, x2, y2) {
                    centerY + radiusY * Math.sin(a));
     }
 }
+
+// Button to export the canvas as a PNG image
+var link = document.createElement('a');
+    link.className = 'btn btn-success';
+    link.innerHTML = 'Export to PNG';
+link.addEventListener('click', function(ev) {
+    link.href = BGcanvas.toDataURL();
+    link.download = "mypainting.png";
+}, false);
+$('#canvas_toolbar').append(link);
 
 // Points Class Prototype Code
 // Here's the points class, not sure where you would like us to implement this
