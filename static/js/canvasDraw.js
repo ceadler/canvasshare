@@ -48,8 +48,8 @@ var cvsTop =  $('#cvs').offset().top
 console.log(cvsLeft, cvsTop);
 var isDrawing = false // a boolean that determines if things are currently being drawn
 var fontStyle = "lobster"
-var fillColor = '0000ff'
-var strokeColor = '0fffff'
+var fillColor = 'ffffff'
+var strokeColor = '000000'
 var strokeSize = 1
 var fillEnabled = false
 var strokeEnabled = true
@@ -120,17 +120,28 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
    jQueryElem.mouseleave(changeToolImage(jQueryElem, toolNum, false));
 }
 
-function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, defaultCheck){
+function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, defaultCheck, text){
    var cBox = document.createElement('div')
+   cBox.setAttribute('id', elementName)
+   cBox.setAttribute('style', 'display:table; background-color:#'+defaultColor+'; height:24px; width:24px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle; overflow:hidden')
+   
    var check= document.createElement('input')
    check.setAttribute('type', 'checkbox')
    check.setAttribute('id', elementName+'_cb')
-   check.setAttribute('style', 'margin:auto; vertical-align:top')
+   check.setAttribute('style', 'margin:auto; vertical-align:top; position:absolute')
    check.checked = defaultCheck;
    $(check).change(function(e){checkCallback(check)})
    cBox.appendChild(check);
-   cBox.setAttribute('id', elementName)
-   cBox.setAttribute('style', 'background-color:#'+defaultColor+'; height:24px; width:24px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle')
+   
+   var letter = document.createElement('div')
+   letter.setAttribute('style','cursor:default; vertical-align:bottom; display:table-cell; font-size:8px; position:relative; top:7px; margin-left:-2; float:left');
+   letter.innerHTML=text;
+   
+   var letterbg = document.createElement('div');
+   letterbg.setAttribute('style', 'background-color:white; width:24px; height:8px; position:relative; bottom:-20px; float:left');
+   cBox.appendChild(letterbg);
+   cBox.appendChild(letter);
+   
    $('#canvas_toolbar').append(cBox)
    $(cBox).colpick({
       onSubmit:function(hsb, hex, rgb, element){
@@ -170,13 +181,15 @@ makeColorBox('fillColorBox',
              function(elem){console.log('C Changed!');
                 fillEnabled = elem.checked;},
              fillColor,
-             fillEnabled)
+             fillEnabled,
+             "fill")
 makeColorBox('strokeColorBox', 
-             function(hex){fillColor = hex;}, 
+             function(hex){strokeColor = hex;}, 
              function(elem){console.log('S Changed!');
                 strokeEnabled = elem.checked;},
              strokeColor,
-             strokeEnabled)
+             strokeEnabled,
+             "stroke")
 makeStrokeSizeBox('strokeSizeBox', 
                   function(size){
                      strokeSize = (Math.abs(parseInt(size)) || 1);
