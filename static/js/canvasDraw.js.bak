@@ -25,6 +25,7 @@ BGcanvas.height = canvas.height;
 var ctx = canvas.getContext('2d')
 var BGctx = BGcanvas.getContext('2d')
 ctx.strokeStyle = "#000";
+ctx.lineWidth = 1
 BGctx.strokeStyle = "#f00";
 BGctx.fillStyle = "#fff";
 BGctx.fillRect(0, 0, BGcanvas.width, BGcanvas.height);
@@ -37,7 +38,7 @@ BGctx.fillRect(0, 0, BGcanvas.width, BGcanvas.height);
 //DATA OBJECTS
 var newDrawings = new Array(0);
 var drawingStack = new Array(0);
-var tools = new Array("freehand", "circle", "rect", "line", "text", "ellipse");
+var tools = new Array("freehand", "circle", "rect", "line", "ellipse", "text");
 var currentTool = tools[1];
 var dataPts = new Array(0);
 var initPt = new Point();
@@ -50,6 +51,8 @@ var fontStyle = "lobster"
 var fillColor = '0000ff'
 var strokeColor = '0fffff'
 var strokeSize = 1
+var fillEnabled = false
+var strokeEnabled = true
 
 
 
@@ -61,15 +64,20 @@ function Point(x, y){
 	this.y = y || 0;
 };
 
-function Drawing(tool, points, strokingColor, fillingColor, strokingSize, words, font){
+function Drawing(tool, points, 
+                 strokingColor, strokingSize, strokingEnabled,
+                 fillingColor, fillingEnabled, 
+                 words, font){
    //console.log("Making new drawing.", tool, points);
    this.tool = tool || 'none'; 
    this.pts = points || [];
    this.sCol = strokingColor || '000000';
    this.fCol = fillingColor || '000000';
-   this.sSiz = strokeSize || 1;
+   this.sSiz = strokingSize || 1;
    this.text = words;
    this.font = font;
+   this.fE = fillingEnabled;
+   this.sE = strokingEnabled;
 };
 
 
@@ -112,31 +120,70 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
    jQueryElem.mouseleave(changeToolImage(jQueryElem, toolNum, false));
 }
 
-function makeColorBox(elementName, callback, defaultColor){
+function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, defaultCheck){
    var cBox = document.createElement('div')
    var check= document.createElement('input')
    check.setAttribute('type', 'checkbox')
    check.setAttribute('id', elementName+'_cb')
    check.setAttribute('style', 'margin:auto; vertical-align:top')
-   check.checked = true;
+   check.checked = defaultCheck;
+   $(check).change(function(e){checkCallback(check)})
    cBox.appendChild(check);
    cBox.setAttribute('id', elementName)
-   cBox.setAttribute('style', 'background-color:#'+defaultColor+'; height:28px; width:28px; float:right; margin:1px; border:1px solid white; text-align:left')
+   cBox.setAttribute('style', 'background-color:#'+defaultColor+'; height:24px; width:24px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle')
    $('#canvas_toolbar').append(cBox)
    $(cBox).colpick({
       onSubmit:function(hsb, hex, rgb, element){
          $(element).css('background-color', '#'+hex);
          $(element).colpickHide();
-         callback(hex, function(){return check.checked;});
+         colorCallback(hex);
       }
    })
 }
+
+function makeStrokeSizeBox(elementName, callback, defaultVal){
+   var ssb = document.createElement('input')
+   ssb.setAttribute('id', elementName)
+   $(ssb).val(defaultVal)
+   $(ssb).keyup(function(e){callback($(ssb).val())})
+   ssb.setAttribute('style', 'height:22px; width:22px; float:left; margin:1px; border:1px solid gray; text-align:left')
+   $('#canvas_toolbar').append(ssb)
+}
+
+String.prototype.format = function() {
+    var s = this,
+        i = arguments.length;
+
+    while (i--) {
+        s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);
+    }
+    return s;
+};
 
 
 
 
 
 //INIT
+makeColorBox('fillColorBox', 
+             function(hex){fillColor = hex;}, 
+             function(elem){console.log('C Changed!');
+                fillEnabled = elem.checked;},
+             fillColor,
+             fillEnabled)
+makeColorBox('strokeColorBox', 
+             function(hex){fillColor = hex;}, 
+             function(elem){console.log('S Changed!');
+                fillEnabled = elem.checked;},
+             strokeColor,
+             strokeEnabled)
+makeStrokeSizeBox('strokeSizeBox', 
+                  function(size){
+                     strokeSize = (Math.abs(parseInt(size)) || 1);
+                     ctx.lineWidth = strokeSize;
+                     console.log(strokeSize, size);
+                  }, 
+                  strokeSize)
 for (t in tools){
    addToolBtn((t-1)+2);
 }
@@ -146,9 +193,6 @@ textBox.setAttribute('style', 'margin-right:3px');
 $('#canvas_toolbar').append(textBox)
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
             redrawStack()})}, 1000)
-
-makeColorBox('fillColorBox', function(hex, getValue){fillColor = (getValue()? hex:null)}, fillColor)
-makeColorBox('strokeColorBox', function(hex, getValue){strokeColor =(getValue()? hex:null)}, strokeColor)
    
    
    
@@ -195,7 +239,10 @@ function startDrawing(mouseEvt){
    initPt = here;
    ctx.moveTo(here.x, here.y); 
    ctx.beginPath();
-   dataPts.push(here); //put this point as the initial point in the array
+   dataPts.push(here);//put this point as the initial point in the array
+   ctx.lineWidth = strokeSize;
+   ctx.fillStyle = '#'+fillColor;
+   ctx.strokeStyle = '#'+strokeColor
 }
 
 function updateDrawing(mouseEvt) {
@@ -236,6 +283,7 @@ function updateDrawing(mouseEvt) {
             ctx.font = textHeight + "px "+fontStyle;
             var textStr = $("#textToolBox").val()
             ctx.fillText(textStr, here.x, here.y);
+            ctx.strokeText(textStr, here.x, here.y);
             var textWidth = ctx.measureText(textStr).width;
             ctx.rect(here.x, here.y, textWidth, -textHeight);
             ctx.stroke();
@@ -265,16 +313,20 @@ function finishDrawing(mouseEvt) {
       var here = new Point();
       here.x = mouseEvt.pageX - cvsLeft;
       here.y = mouseEvt.pageY - cvsTop;
+      console.log(fillEnabled, strokeEnabled);
       dataPts.push(here);
       var thisDrawing = 
          new Drawing(currentTool, 
                      $.extend(true, new Array(0), dataPts), 
-                     strokeColor, 
-                     fillColor, 
-                     strokeSize, 
+                     (strokeEnabled? strokeColor:''), 
+                     (strokeEnabled? strokeSize :0), 
+                     strokeEnabled,
+                     (fillEnabled? fillColor:''),
+                     fillEnabled,
                      ((currentTool == 'text')? 
                         $("#textToolBox").val() : ''),
-                     ctx.font);
+                     ((currentTool == 'text')?
+                        ctx.font:''))
       loadDrawings(
          function(m){clearAndReloadDS(m);
                      drawingStack.push(thisDrawing);
@@ -300,6 +352,8 @@ function redraw(drawing){//Later implementation
    if (pts.length >= 2){
       BGctx.fillStyle = '#'+drawing.fCol;
       BGctx.strokeStyle = '#'+drawing.sCol;
+      BGctx.lineWidth = drawing.sSiz;
+      //console.log("Making drawing: fill:{0}|{3}, stroke:{1}px {2}".format(BGctx.fillStyle, BGctx.strokeStyle, BGctx.lineWidth, drawing.fE));
       switch(tool){
          case "freehand":
             BGctx.beginPath();
@@ -316,6 +370,7 @@ function redraw(drawing){//Later implementation
          case "rect":
             BGctx.beginPath();
             BGctx.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
+            BGctx.fill();
             break;
          case "line":
             BGctx.beginPath();
@@ -327,6 +382,7 @@ function redraw(drawing){//Later implementation
             BGctx.beginPath()
             BGctx.font = drawing.font || '36px serif'
             BGctx.fillText(drawing.text, pts[1].x, pts[1].y);
+            BGctx.strokeText(drawing.text, pts[1].x, pts[1].y);
             break;
          case "ellipse":
             clearCanvas(ctx);
@@ -335,7 +391,8 @@ function redraw(drawing){//Later implementation
             break;
          default: break;
       }
-      BGctx.stroke();
+      if(drawing.fE)BGctx.fill();
+      if(drawing.sE)BGctx.stroke();
    }
 };
 
