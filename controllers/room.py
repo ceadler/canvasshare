@@ -14,15 +14,16 @@ def index():
    
 def getRecent():
    '''Gets a copy of the most recent data'''
-   arg = request.args(0) or ''
-   ajaxRoom = arg;
+   ajaxRoom = request.args(0) or ''
    canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
    if canvasRoom is None:
        raise HTTP(204, 'no content');
    latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
    if latest_snap is None:
        raise HTTP(204, 'no content');
-   data = latest_snap.drawing_stack;
+   data = latest_snap.drawing_stack or ''
+   if data is '':
+      raise HTTP(204, 'no-content');
    return data
    
    

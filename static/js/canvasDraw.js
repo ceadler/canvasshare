@@ -536,7 +536,7 @@ function makeDatabaseEntry(drawings){
 
 function clearAndReloadDS(jsonData){
    //console.log("Before!", jsonData)
-   if (jsonData != ''){
+   if (jsonData != '' && jsonData != undefined){
       var obj = JSON.parse(jsonData);
       //console.log("after!")
       clearStack();
