@@ -103,10 +103,25 @@
   <script> var app_name = '{{=request.application}}'</script>
     <!-- Masthead ================================================== -->
     <section id="main" class="main row">
-    <style> @font-face {
-       font-family: lobster;
-       src: url({{=URL('static', 'fonts/lobster.otf')}})
-    }</style>
+    <style>
+       @font-face{font-family: Alex-Brush;
+                  src: url({{=URL('static', 'fonts/AlexBrush-Regular.ttf')}})}
+       @font-face{font-family: Amaranth-Regular;
+                  src: url({{=URL('static', 'fonts/Amaranth-Regular.otf')}})}
+       @font-face{font-family: Anonymous;
+                  src: url({{=URL('static', 'fonts/Anonymous.ttf')}})}
+       @font-face{font-family: CaviarDreams;
+                  src: url({{=URL('static', 'fonts/CaviarDreams.ttf')}})}
+       @font-face{font-family: DroidSans;
+                  src: url({{=URL('static', 'fonts/DroidSans.ttf')}})}
+       @font-face{font-family: Lobster;
+                  src: url({{=URL('static', 'fonts/Lobster.otf')}})}
+       @font-face{font-family: Raleway-Regular;
+                  src: url({{=URL('static', 'fonts/Raleway-Regular.ttf')}})}
+    </style>
+    <script> var fonts = ['Alex-Brush', 'Amaranth-Regular', 'Anonymous', 'CaviarDreams', 
+                          'DroidSans', 'Lobster', 'Raleway-Regular']
+    </script>
             {{include}}<? Comment: This is where extended pages are inserted?>
     </section><!--/main-->
     </div>

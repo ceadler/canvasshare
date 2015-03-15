@@ -13,9 +13,14 @@ canvas.style.left = BGcanvas.style.left = boundingRect.left;
 canvas.style.top = BGcanvas.style.top = boundingRect.top;
 
 canvas.width = $("#cvs").parent().width();
-canvas.height = canvas.width * (9/16)
+canvas.height = canvas.width * (10/16)
 BGcanvas.width = canvas.width;
 BGcanvas.height = canvas.height;
+
+$("#elemList").attr('style', 'width:98px; border:1px solid gray; overflow-y:scroll; \
+                              height:'+(canvas.height-2)+'px; margin-left:0px');
+                              
+$("#clear_btn").click(function(e){clearEverything();})
 
 
 
@@ -29,6 +34,8 @@ ctx.lineWidth = 1
 BGctx.strokeStyle = "#f00";
 BGctx.fillStyle = "#fff";
 BGctx.fillRect(0, 0, BGcanvas.width, BGcanvas.height);
+ctx.lineJoin='round';
+BGctx.lineJoin='round';
 ctx.lineCap='round';
 BGctx.lineCap='round';
 ctx.miterLimit=1;
@@ -51,13 +58,13 @@ var cvsLeft =  $('#cvs').offset().left //updated every time we start drawing
 var cvsTop =  $('#cvs').offset().top
 console.log(cvsLeft, cvsTop);
 var isDrawing = false // a boolean that determines if things are currently being drawn
-var fontStyle = "lobster"
+var fontFace = "Lobster"
+var fontSize = 36
 var fillColor = 'ffffff'
 var strokeColor = '000000'
 var strokeSize = 1
 var fillEnabled = false
 var strokeEnabled = true
-
 
 
 
@@ -112,7 +119,8 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
    
    var toolBtnImg = document.createElement('img'); //creates a new image
    toolBtnImg.setAttribute('id', elementName); // sets the name
-   toolBtnImg.setAttribute('style', 'margin-right:3px');
+   toolBtnImg.setAttribute('style', 'margin-right:3px; float:left; position:relative;\
+                                     top:1px');
    $('#canvas_toolbar').append(toolBtnImg); //adds the image to the toolbar div
    
    var jQueryElem = $("#"+elementName); //gets the element as a jQuery element
@@ -127,7 +135,11 @@ function addToolBtn(toolNum){ // adds a tool to the toolbar (Mostly dynamically 
 function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, defaultCheck, text, textSize){
    var cBox = document.createElement('div')
    cBox.setAttribute('id', elementName)
-   cBox.setAttribute('style', 'display:table; background-color:#'+defaultColor+'; height:24px; width:28px; float:left; margin:1px; border:1px solid white; text-align:left; vertical-align:middle; overflow:hidden')
+   cBox.setAttribute('style', 'display:table; background-color:#'+defaultColor+'; \
+                               height:20px; width:28px; float:left; margin:1px; \
+                               border:1px solid white; text-align:left; \
+                               vertical-align:middle; overflow:hidden;\
+                               margin-right:3px')
    
    var check= document.createElement('input')
    check.setAttribute('type', 'checkbox')
@@ -144,7 +156,8 @@ function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, d
    
    var letterbg = document.createElement('div');
    letterbg.setAttribute('style', 'background-color:white; width:28px; height:8px; \
-                                   position:relative; bottom:-20px; float:left');
+                                   position:relative; border-top:1px solid #aaaaaa; \
+                                   bottom:-20px;float:left');
    cBox.appendChild(letterbg);
    cBox.appendChild(letter);
    
@@ -158,31 +171,44 @@ function makeColorBox(elementName, colorCallback, checkCallback, defaultColor, d
    })
 }
 
-function makeStrokeSizeBox(elementName, callback, defaultVal, text, textSize){
+function makeSizeBox(elementName, callback, defaultVal, text, textSize){
    var cont = document.createElement('div')
-   cont.setAttribute('style', 'height:22px; width:28px; float:left; margin-left:1px')
+   cont.setAttribute('style', 'height:22px; width:30px; float:left; margin-left:1px;\
+                               position:relative; top:1px;')
    
-   var ssb = document.createElement('input')
-   ssb.setAttribute('id', elementName)
-   $(ssb).val(defaultVal)
-   $(ssb).keyup(function(e){callback($(ssb).val())})
-   ssb.setAttribute('style', 'height:19px; width:26px; position:absolute; \
-                              margin:auto; border:0px; text-align:left;\
+   var sb = document.createElement('input')
+   sb.setAttribute('id', elementName)
+   $(sb).val(defaultVal)
+   $(sb).keyup(function(e){callback($(sb).val())})
+   sb.setAttribute('style', 'height:18px; width:26px; position:absolute; \
+                              margin:auto; border:1px solid #aaa; text-align:left;\
                               vertical-align:top; text-align:right')
-   cont.appendChild(ssb);
+   cont.appendChild(sb);
       
    var letter = document.createElement('div')
    letter.setAttribute('style','cursor:default; font-size:'+textSize+'px; position:relative; \
-                                top:8px;float:left; margin-left:1-x');
+                                top:5px;float:left; margin-left:1px');
    letter.innerHTML=text;
    
    var letterbg = document.createElement('div');
-   letterbg.setAttribute('style', 'background-color:#fff; width:24px; height:7px; \
-                                   position:relative; top:22px; float:left;\
-                                   border:1px solid #eee');
+   letterbg.setAttribute('style', 'background-color:#fff; width:26px; height:9px; \
+                                   position:relative; top:20px; float:left;\
+                                   border:1px solid #aaaaaa');
    cont.appendChild(letterbg);
    cont.appendChild(letter);
    $('#canvas_toolbar').append(cont)
+}
+
+function makeSelectBox(id, options, style, callback){
+   var selStyle = "border-radius:unset; -webkit-border-radius:unset; height:24px; \
+                   padding:unset; margin-bottom:unset; position:relative; top:5px; \
+                   float:left; margin-left:4px;"
+   var selBox = document.createElement('select');
+   selBox.setAttribute('id', id);
+   selBox.setAttribute('style', selStyle+style);
+   for (o in options){$(selBox).append(options[o])}
+   $('#canvas_toolbar').append(selBox)
+   $(selBox).change(function(e){callback($(selBox).val(), selStyle)})
 }
 
 String.prototype.format = function() {
@@ -202,34 +228,51 @@ String.prototype.format = function() {
 //INIT
 makeColorBox('fillColorBox', 
              function(hex){fillColor = hex;}, 
-             function(elem){console.log('C Changed!');
-                fillEnabled = elem.checked;},
+             function(elem){fillEnabled = elem.checked;},
              fillColor,
              fillEnabled,
              "Fill", 10)
 makeColorBox('strokeColorBox', 
              function(hex){strokeColor = hex;}, 
-             function(elem){console.log('S Changed!');
-                strokeEnabled = elem.checked;},
+             function(elem){strokeEnabled = elem.checked;},
              strokeColor,
              strokeEnabled,
              "Stroke", 9)
-makeStrokeSizeBox('strokeSizeBox', 
-                  function(size){
-                     strokeSize = (Math.abs(parseInt(size)) || 1);
-                     ctx.lineWidth = strokeSize;
-                     console.log(strokeSize, size);
-                  }, 
-                  strokeSize,
-                  "width", 10)
+makeSizeBox('strokeSizeBox', 
+             function(size){
+                strokeSize = (Math.abs(parseInt(size)) || 1);
+                ctx.lineWidth = strokeSize;
+             }, 
+             strokeSize,
+             "width", 10)
 for (t in tools){
    addToolBtn((t-1)+2);
 }
+makeSizeBox('fontSizeBox', 
+             function(size){
+                fontSize = (Math.abs(parseInt(size)) || 36);
+                ctx.font = fontSize+'px '+fontFace;
+             }, 
+             fontSize,
+             "Size", 9)
 var textBox = document.createElement('input');
 textBox.setAttribute('id', "textToolBox");
-textBox.setAttribute('style', 'margin-right:3px');
+textBox.setAttribute('style', 'margin-left:2px; float:left; vertical-align:bottom;\
+                               position:relative; top:5px');
 textBox.setAttribute('placeholder', 'Insert text here');
 $('#canvas_toolbar').append(textBox)
+
+makeSelectBox('fontSelectBox', 
+               fonts.map(function(font){
+                  return ('<optgroup style="font-family:'+font+'"><option>'+font+'</option></optgorup>')
+               }),
+               "background-color:#ffffff",
+               function(newFont, selStyle){
+                  $("#fontSelectBox").attr('style', selStyle+'font-family:'+newFont)
+                  fontFace = newFont;
+                  console.log
+               })
+                  
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
             redrawStack()})}, 1000)
    
@@ -319,7 +362,7 @@ function updateDrawing(mouseEvt) {
             ctx.beginPath();
             clearCanvas(ctx);
             var textHeight = 36;
-            ctx.font = textHeight + "px "+fontStyle;
+            ctx.font = textHeight + "px "+fontFace;
             var textStr = $("#textToolBox").val()
             ctx.fillText(textStr, here.x, here.y);
             ctx.strokeText(textStr, here.x, here.y);
@@ -419,11 +462,11 @@ function redraw(drawing){//Later implementation
             //clearCanvas(ctx);
             BGctx.beginPath()
             BGctx.font = drawing.font || '36px serif'
-            BGctx.fillText(drawing.text, pts[1].x, pts[1].y);
-            BGctx.strokeText(drawing.text, pts[1].x, pts[1].y);
+            if(drawing.fE){BGctx.fillText(drawing.text, pts[1].x, pts[1].y);}
+            if(drawing.sE){BGctx.strokeText(drawing.text, pts[1].x, pts[1].y);}
             break;
          case "ellipse":
-            clearCanvas(ctx);
+            //clearCanvas(ctx);
             drawEllipseFinal(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
             BGctx.closePath();
             break;
@@ -444,6 +487,27 @@ function redrawStack(){
       redraw(drawingStack[d])
    };
    //console.log("STOPPING!!!!")
+}
+
+function clearEverything(){
+   clearStack();
+   clearCanvas(ctx);
+   clearCanvas(BGctx);
+   $.ajax(
+   {
+      type: 'POST',
+      url: '/'+app_name+'/room/saveSnapshot',
+      data: 
+      { 
+         author: 'Carl Eadler',
+         room: roomID,
+         objectStack: ""
+      }
+   }).done(function( msg ) {/*alert( "Data Saved: " + msg );*/});
+}
+
+function clearStack(){
+   drawingStack.splice(0,drawingStack.length);
 }
 
 //function makeDatabaseEntry(tool, pts, strokeColor, fillColor, strokeSize){;//COMPLETE ME LATER
@@ -472,9 +536,9 @@ function makeDatabaseEntry(drawings){
 function clearAndReloadDS(jsonData){
    //console.log("Before!", jsonData)
    if (jsonData != ''){
-      obj = JSON.parse(jsonData);
+      var obj = JSON.parse(jsonData);
       //console.log("after!")
-      drawingStack.splice(0,drawingStack.length);
+      clearStack();
       drawingStack= obj;
    }
 }
@@ -565,6 +629,16 @@ function drawEllipseFinal(x1, y1, x2, y2) {
                    centerY + radiusY * Math.sin(a));
     }
 }
+
+// Button to export the canvas as a PNG image
+var link = document.createElement('a');
+    link.className = 'btn btn-success';
+    link.innerHTML = 'Export to PNG';
+link.addEventListener('click', function(ev) {
+    link.href = BGcanvas.toDataURL();
+    link.download = "mypainting.png";
+}, false);
+$('#canvas_toolbar').append(link);
 
 // Points Class Prototype Code
 // Here's the points class, not sure where you would like us to implement this
@@ -661,25 +735,44 @@ function drawEllipseFinal(x1, y1, x2, y2) {
    P.prototype.Set = function (p) {this.x = p.x;this.y = p.y;};
 */
 
-//OTHER IDEAS / TO DO
+
+
+//GIT COMMANDS
+// git init
+// git remote add <url>
+// git add .
+// git commit -m "message"
+// git push something something
+// git branch? something like that
+
+
+//DONE 
 // - !points as a class
 //     -redefine dist() function 
 // - !drawing objects as a class
 //     -redefine functions in terms of objects instead of parameters
 // - !basic database interaction
-// - !absolute coordinates
 // - !work on making tools work (rects, lines, text, elipses)
-// - !Find out how to push updates to the user
 
 // - Make a list of images of tools as HTML elements 
 //   and when you click on one, it switches to that tool
 //   (and alters image to reflect choice?)
+// - lack of color
+// - get everyone on the github
+
+
+
+//OTHER IDEAS / TO DO
+// - !absolute coordinates
+// - !push updates to the user
+// - !Side list of elements
+// - !Clear button
+
 // - work on loading button images from sprite sheets instead of individually by button
 // - Work on the chat box (different JS file though)
 // - work on snapshots
 // - personalized rooms
 // - draw a grid
-// - null for lack of color
 // - add transformations (translations, zoom in, zoom out)
 // - add snap-to-grid function, 
 // - ability to press shift to make elipses and rects into circles and squares
@@ -692,14 +785,3 @@ function drawEllipseFinal(x1, y1, x2, y2) {
 // - guidelines for cursor
 
 // - some kind of nice border for the canvas element
-
-//GENERAL
-// - get everyone on the github
-
-//GIT COMMANDS
-// git init
-// git remote add <url>
-// git add .
-// git commit -m "message"
-// git push something something
-// git branch? something like that

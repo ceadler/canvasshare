@@ -18,10 +18,10 @@ def getRecent():
    ajaxRoom = arg;
    canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
    if canvasRoom is None:
-      return ''
+       raise HTTP(204, 'no content');
    latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
    if latest_snap is None:
-      return ''
+       raise HTTP(204, 'no content');
    data = latest_snap.drawing_stack;
    return data
    
@@ -31,7 +31,7 @@ def getRecent():
 def submitData():
    '''Function for saving a new artifact of data'''
    ajaxRoom = request.vars.room or '';
-   ajaxData = request.vars.objectStack or 'no param!'   
+   ajaxData = request.vars.objectStack or ''   
    canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
    
    if not (ajaxRoom is '' or canvasRoom is None):
@@ -47,12 +47,12 @@ def submitData():
    
 def saveSnapshot():
    '''a samle ajax call'''
-   ajaxAuthor = request.vars.author or 'no param!'
+   #ajaxAuthor = request.vars.author or 'no param!'
    ajaxRoom = request.vars.room or '';
-   ajaxData = request.vars.objectStack or 'no param!'   
+   ajaxData = request.vars.objectStack or '';
    
    if ajaxRoom is '':
-      return ''#throw some other error instead actually
+       raise HTTP(204, 'no content');#throw some other error instead actually
    canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
    #content = db(db.room.roomIdentifier == ajaxRoom).count();
    logger.info(canvasRoom);
