@@ -493,7 +493,6 @@ function clearEverything(){
    clearStack();
    clearCanvas(ctx);
    clearCanvas(BGctx);
-   fillBackground(BGctx, '#ffffff')
    $.ajax(
    {
       type: 'POST',
