@@ -272,10 +272,15 @@ makeSelectBox('fontSelectBox',
                   fontFace = newFont;
                   console.log
                })
+roomExists(function(exists){
+   if (!exists){
+      makeSnapshot(drawingStack);
+   }
+})
                   
 setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
             redrawStack()})}, 1000)
-   
+
    
    
    
@@ -298,7 +303,7 @@ $(document).keydown(function(e){
    //if (e.keyCode == 80){ console.log(drawingStack);}    // 80 = P
    //if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
    //                      fillBackground(BGctx, "#fff");}
-   //if (e.keyCode == 74){ makeDatabaseEntry();}          // 74 = J
+   //if (e.keyCode == 74){ submitData();}          // 74 = J
    if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
    console.log(e.keyCode);
 });
@@ -411,7 +416,7 @@ function finishDrawing(mouseEvt) {
                         ctx.font:''))
       drawingStack.push(thisDrawing);
       redraw(thisDrawing);
-      makeDatabaseEntry(thisDrawing);
+      submitData(thisDrawing);
       loadDrawings(function(m){clearAndReloadDS(m); redrawStack(); });
    }
    ctx.closePath();
@@ -509,29 +514,44 @@ function clearStack(){
    drawingStack.splice(0,drawingStack.length);
 }
 
-//function makeDatabaseEntry(tool, pts, strokeColor, fillColor, strokeSize){;//COMPLETE ME LATER
-function makeDatabaseEntry(drawing){
-   //drawings should be a list of drawing objects
-   //most commonly used via ajax
-   //a snapshot will use this, but will create a new 'revision' whereas
-   //a normal call to this will update the most recent version
-   //probably convert to JSON
-   //local to canvas room
-   var varh = "hello!";
+
+function submitData(drawing){
    console.log("Saving!", JSON.stringify(drawing));
-   //ajax('/CanvasShare/room/testAjax', ['varh'], 'chatbox')
    $.ajax(
    {
       type: 'POST',
       url: '/'+app_name+'/room/submitData',
       data: 
       { 
-         author: 'Carl Eadler',
          room: roomID,
          objectStack: JSON.stringify(drawing)
       }
-   }).done(function( msg ) {alert( "Data Saved: " + msg );});
+   }).done(function( msg ) {/*alert( "Data Saved: " + msg )*/;});
 }
+
+
+function makeSnapshot(drawings){
+   console.log("Snapshot!");
+   $.ajax(
+   {
+      type: 'POST',
+      url: '/'+app_name+'/room/submitData',
+      data: 
+      { 
+         room: roomID,
+         objectStack: JSON.stringify(drawings)
+      }
+   }).done(function( msg ) {console.log( "Data Saved: " + msg );});
+}
+
+function roomExists(callback){
+   $.ajax(
+   {
+      type: 'GET',
+      url: '/'+app_name+'/room/exists/'+roomID,
+   }).done(function( bool ) {callback((bool.toLowerCase()=="true"?true:false)); console.log( "Room exists?: " ,bool,  (bool=="true"?true:false) );});
+}
+
 
 function clearAndReloadDS(jsonData){
    console.log("JSONData:", jsonData)

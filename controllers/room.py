@@ -12,6 +12,11 @@ def index():
    arg = request.args(0) or ''
    return dict(arg=arg)
    
+def exists():
+   '''Ajax call for finding out if the room exists'''
+   ajaxRoom = request.args(0) or ''
+   return (db(db.room.roomIdentifier == ajaxRoom).select().first() is not None)
+   
 def getRecent():
    '''Gets a copy of the most recent data'''
    ajaxRoom = request.args(0) or ''
@@ -56,7 +61,8 @@ def saveSnapshot():
    ajaxData = request.vars.objectStack or '';
    
    if ajaxRoom is '':
-       raise HTTP(204, 'no content');#throw some other error instead actually
+      return "Error:"+ajaxRoom+'; '+ajaxData
+       #raise HTTP(204, 'no content');#throw some other error instead actually
    canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
    #content = db(db.room.roomIdentifier == ajaxRoom).count();
    logger.info(canvasRoom);
