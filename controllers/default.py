@@ -10,18 +10,12 @@
 #########################################################################
 
 def index():
-    """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
+    AllCanvas_ = db().select(db.room.roomIdentifier);
+    AllCanvas = db().select(db.room.roomIdentifier, orderby=db.room.roomIdentifier);
+    return dict(AllCanvas=AllCanvas);
 
-    if you need a simple wiki simply replace the two lines below with:
-    return auth.wiki()
-    """
-    #UPDATE ME
-    #When the user clicks new room, generate new room in database
-    return dict()
-
-def inexistent():
+def error404():
+   '''Data for this page located in its HTML. Here as a dummy function'''
    return dict()
 
 def user():

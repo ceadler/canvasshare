@@ -1,8 +1,28 @@
 {{left_sidebar_disabled=True,right_sidebar_disabled=True,('message' in globals())}}
 {{extend 'layout.html'}}
 <script>document.body.style.background ="#1a1a1a";</script>
-<div class="span12" style="margin-left:0"> 
-   <p style="text-align:center">
-      {{=A('Get started with CanvasShare', _class='btn btn-primary', _href=URL('room', 'index', args=['123141']))}}
-   </p>
+
+<div class ="span12" style="margin-left:0">
+    <p style="text-align:center">
+        {{=A('Create a Room', _class = 'btn', _id = "goButton", _href=URL('room', 'index', args=[]))}}
+        <input id = "roomname" placeholder = "Enter A Room Name">
+        </input>
+    </p>
+</div>
+
+<script>function roomlink(name){
+    return "{{=URL('room', 'index')}}" + "/" + name
+    }
+    $("#roomname").keyup(function(e){
+                    $("#goButton").attr('href', roomlink($("#roomname").val()))
+    })
+</script>
+
+
+<div style="color:white;">
+    {{for c in AllCanvas:}}
+    <div class='span4' style='background-color:green; height:200px; width:200px; text-align:center; margin:10px 10px'>
+       {{=A(c.roomIdentifier, _href=URL('room', 'index', args=[c.roomIdentifier]))}}
+    </div>
+    {{pass}}
 </div>
