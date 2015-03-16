@@ -409,12 +409,10 @@ function finishDrawing(mouseEvt) {
                         $("#textToolBox").val() : ''),
                      ((currentTool == 'text')?
                         ctx.font:''))
-      loadDrawings(
-         function(m){clearAndReloadDS(m);
-                     drawingStack.push(thisDrawing);
-                     redrawStack();
-                     makeDatabaseEntry(drawingStack);
-      });
+      drawingStack.push(thisDrawing);
+      redraw(thisDrawing);
+      makeDatabaseEntry(thisDrawing);
+      loadDrawings(function(m){clearAndReloadDS(m); redrawStack(); });
    }
    ctx.closePath();
    clearCanvas(ctx);
@@ -502,7 +500,7 @@ function clearEverything(){
       { 
          author: 'Carl Eadler',
          room: roomID,
-         objectStack: ""
+         objectStack: "[]"
       }
    }).done(function( msg ) {/*alert( "Data Saved: " + msg );*/});
 }
@@ -512,7 +510,7 @@ function clearStack(){
 }
 
 //function makeDatabaseEntry(tool, pts, strokeColor, fillColor, strokeSize){;//COMPLETE ME LATER
-function makeDatabaseEntry(drawings){
+function makeDatabaseEntry(drawing){
    //drawings should be a list of drawing objects
    //most commonly used via ajax
    //a snapshot will use this, but will create a new 'revision' whereas
@@ -520,23 +518,24 @@ function makeDatabaseEntry(drawings){
    //probably convert to JSON
    //local to canvas room
    var varh = "hello!";
+   console.log("Saving!", JSON.stringify(drawing));
    //ajax('/CanvasShare/room/testAjax', ['varh'], 'chatbox')
    $.ajax(
    {
       type: 'POST',
-      url: '/'+app_name+'/room/saveSnapshot',
+      url: '/'+app_name+'/room/submitData',
       data: 
       { 
          author: 'Carl Eadler',
          room: roomID,
-         objectStack: JSON.stringify(drawings)
+         objectStack: JSON.stringify(drawing)
       }
-   }).done(function( msg ) {/*alert( "Data Saved: " + msg );*/});
+   }).done(function( msg ) {alert( "Data Saved: " + msg );});
 }
 
 function clearAndReloadDS(jsonData){
-   //console.log("Before!", jsonData)
-   if (jsonData != '' and jsonData != undefined){
+   console.log("JSONData:", jsonData)
+   if (jsonData != '' && jsonData != undefined){
       var obj = JSON.parse(jsonData);
       //console.log("after!")
       clearStack();

@@ -38,9 +38,16 @@ def submitData():
    if not (ajaxRoom is '' or canvasRoom is None):
       #return ''#fail silently
       latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
-      newData = latest_snap.drawing_stack + ajaxData
-      latest_snap.update_record(drawing_stack = ajaxData);
-      #return ''
+      oldDataSplit = latest_snap.drawing_stack[1:-1].split(',')
+      if latest_snap.drawing_stack[1:-1] is '':
+         newData = '['+ajaxData+']';
+         #return "1"
+      else:
+         newData = '['+(','.join(oldDataSplit +ajaxData.split(',')))+']';
+         #return "2"
+      #newData = json.dumps(json.load(latest_snap.drawing_stack) + json.load(ajaxData))
+      latest_snap.update_record(drawing_stack = newData);
+      return latest_snap.drawing_stack[1:-1]
    #else:
    
    
