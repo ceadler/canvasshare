@@ -1,0 +1,10 @@
+{{left_sidebar_disabled=True,right_sidebar_disabled=True,('message' in globals())}}
+{{extend 'layout.html'}}
+<script>document.body.style.background ="#1a1a1a";</script>
+<h2 style="color:white;">
+    {{for c in AllCanvas:}}
+    <div class='span4' style='background-color:green; height:200px; width:200px; text-align:center; margin:10px 0px'>
+       {{=c.roomIdentifier}}
+    </div>
+    {{pass}}
+</h2>
