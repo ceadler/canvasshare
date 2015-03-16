@@ -415,7 +415,7 @@ function finishDrawing(mouseEvt) {
                      ((currentTool == 'text')?
                         ctx.font:''))
       drawingStack.push(thisDrawing);
-      redraw(thisDrawing);
+      redraw(BGctx, thisDrawing);
       submitData(thisDrawing);
       loadDrawings(function(m){clearAndReloadDS(m); redrawStack(); });
    }
@@ -425,7 +425,7 @@ function finishDrawing(mouseEvt) {
    isDrawing = false;
 }
 
-function redraw(drawing){//Later implementation
+function redraw(context, drawing){//Later implementation
    //function redraw(tool, pts, strokeColor, fillColor, strokeSize){
    //Takes a list of parameters (--later, convert to a single object)
    //and redraws them on the background canvas to allow a staic image there
@@ -435,48 +435,48 @@ function redraw(drawing){//Later implementation
    //console.log("in redraw!", tool, pts);
 
    if (pts.length >= 2){
-      BGctx.fillStyle = '#'+drawing.fCol;
-      BGctx.strokeStyle = '#'+drawing.sCol;
-      BGctx.lineWidth = drawing.sSiz;
-      //console.log("Making drawing: fill:{0}|{3}, stroke:{1}px {2}".format(BGctx.fillStyle, BGctx.strokeStyle, BGctx.lineWidth, drawing.fE));
+      context.fillStyle = '#'+drawing.fCol;
+      context.strokeStyle = '#'+drawing.sCol;
+      context.lineWidth = drawing.sSiz;
+      //console.log("Making drawing: fill:{0}|{3}, stroke:{1}px {2}".format(context.fillStyle, BGctx.strokeStyle, BGctx.lineWidth, drawing.fE));
       switch(tool){
          case "freehand":
-            BGctx.beginPath();
-            BGctx.moveTo(pts[0].x, pts[0].y);
+            context.beginPath();
+            context.moveTo(pts[0].x, pts[0].y);
             for (p in pts){
                //console.log("drawing:", pts[p][0], pts[p][1]); //WORK ON CHANGING THIS NOTATION BY MAKING A POINT CLASS
-               BGctx.lineTo(pts[p].x, pts[p].y);
+               context.lineTo(pts[p].x, pts[p].y);
             }
             break;
          case "circle":
-            BGctx.beginPath();
-            BGctx.arc(pts[0].x, pts[0].y, distPt(pts[0], pts[1]), 0, 2*Math.PI);
+            context.beginPath();
+            context.arc(pts[0].x, pts[0].y, distPt(pts[0], pts[1]), 0, 2*Math.PI);
             break;
          case "rect":
-            BGctx.beginPath();
-            BGctx.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
+            context.beginPath();
+            context.rect(pts[0].x, pts[0].y, pts[1].x -pts[0].x, pts[1].y -pts[0].y);
             break;
          case "line":
-            BGctx.beginPath();
-            BGctx.moveTo(pts[0].x, pts[0].y);
-            BGctx.lineTo(pts[1].x, pts[1].y);
+            context.beginPath();
+            context.moveTo(pts[0].x, pts[0].y);
+            context.lineTo(pts[1].x, pts[1].y);
             break;
          case "text":
             //clearCanvas(ctx);
-            BGctx.beginPath()
-            BGctx.font = drawing.font || '36px serif'
-            if(drawing.fE){BGctx.fillText(drawing.text, pts[1].x, pts[1].y);}
-            if(drawing.sE){BGctx.strokeText(drawing.text, pts[1].x, pts[1].y);}
+            context.beginPath()
+            context.font = drawing.font || '36px serif'
+            if(drawing.fE){context.fillText(drawing.text, pts[1].x, pts[1].y);}
+            if(drawing.sE){context.strokeText(drawing.text, pts[1].x, pts[1].y);}
             break;
          case "ellipse":
             //clearCanvas(ctx);
             drawEllipseFinal(pts[0].x, pts[0].y, pts[1].x, pts[1].y);
-            BGctx.closePath();
+            context.closePath();
             break;
          default: break;
       }
-      if(drawing.fE){BGctx.closePath(); BGctx.fill();}
-      if(drawing.sE){BGctx.stroke();}
+      if(drawing.fE){context.closePath(); context.fill();}
+      if(drawing.sE){context.stroke();}
    }
 };
 
@@ -488,6 +488,14 @@ function prependToSidebar(drawing){
    $(block).click(function(e){drawingStack.splice(pos, 1);
                               deleteData(pos);
                               redrawStack();});
+   $(block).mouseover(function(e){
+                             var exaggerate = drawing;
+                             exaggerate.sE = true;
+                             exaggerate.sSiz += 5;
+                             exaggerate.sCol = "#ff0000"
+                             redraw(ctx, exaggerate);
+   })
+   $(block).mouseout(function(e){clearCanvas(ctx)});
    block.innerHTML = drawing.tool
    $("#elemList").prepend(block);
 }
@@ -504,7 +512,7 @@ function redrawStack(){
    clearSidebar();
    for (d in drawingStack){
       //console.log("Drawing!", (parseInt(d)+1) +'/'+drawingStack.length);
-      redraw(drawingStack[d]);
+      redraw(BGctx, drawingStack[d]);
       prependToSidebar(drawingStack[d]);
    };
    //console.log("STOPPING!!!!")
@@ -512,6 +520,7 @@ function redrawStack(){
 
 function clearEverything(){
    clearStack();
+   redrawStack();
    clearCanvas(ctx);
    clearCanvas(BGctx);
    fillBackground(BGctx, '#ffffff')
