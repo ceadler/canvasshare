@@ -85,10 +85,10 @@ function Drawing(tool, points,
    this.sCol = strokingColor || '000000';
    this.fCol = fillingColor || '000000';
    this.sSiz = strokingSize || 1;
-   this.text = words;
-   this.font = font;
-   this.fE = fillingEnabled;
-   this.sE = strokingEnabled;
+   this.text = words || '';
+   this.font = font || '';
+   this.fE = fillingEnabled || false;
+   this.sE = strokingEnabled || true;
 };
 
 
@@ -480,14 +480,32 @@ function redraw(drawing){//Later implementation
    }
 };
 
+function prependToSidebar(drawing){
+   var block = document.createElement('p');
+   block.setAttribute('style', 'color:red');
+   block.setAttribute('class', 'btn');
+   var pos = drawingStack.map(function(e) { return (e === drawing); }).indexOf(true);
+   $(block).click(function(e){drawingStack.splice(pos, 1);
+                              deleteData(pos);
+                              redrawStack();});
+   block.innerHTML = drawing.tool
+   $("#elemList").prepend(block);
+}
+   
+function clearSidebar(){
+   $("#elemList").empty();
+}
+
 function redrawStack(){
    //console.log("Starting!")
    //clears the background canvas and redraws every element on the drawing stack
    clearCanvas(BGctx);
    fillBackground(BGctx, '#fff');
+   clearSidebar();
    for (d in drawingStack){
       //console.log("Drawing!", (parseInt(d)+1) +'/'+drawingStack.length);
-      redraw(drawingStack[d])
+      redraw(drawingStack[d]);
+      prependToSidebar(drawingStack[d]);
    };
    //console.log("STOPPING!!!!")
 }
@@ -514,7 +532,22 @@ function clearStack(){
    drawingStack.splice(0,drawingStack.length);
 }
 
+function deleteData(dIndex){
+   console.log("del!");
+   $.ajax(
+   {
+      type: 'POST',
+      url: '/'+app_name+'/room/delete',
+      data: 
+      { 
+         room: roomID,
+         drawingIndex: dIndex
+      }
+   }).done(function( msg ) {console.log( "Delete: " + msg );});
+}
 
+
+   
 function submitData(drawing){
    console.log("Saving!", JSON.stringify(drawing));
    $.ajax(
@@ -535,7 +568,7 @@ function makeSnapshot(drawings){
    $.ajax(
    {
       type: 'POST',
-      url: '/'+app_name+'/room/submitData',
+      url: '/'+app_name+'/room/saveSnapshot',
       data: 
       { 
          room: roomID,
@@ -554,10 +587,9 @@ function roomExists(callback){
 
 
 function clearAndReloadDS(jsonData){
-   console.log("JSONData:", jsonData)
+   //console.log("JSONData:", jsonData)
    if (jsonData != '' && jsonData != undefined){
       var obj = JSON.parse(jsonData);
-      //console.log("after!")
       clearStack();
       drawingStack= obj;
    }

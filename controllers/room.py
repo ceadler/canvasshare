@@ -53,6 +53,30 @@ def submitData():
    
    
    
+def delete():
+   '''a samle ajax call'''
+   #ajaxAuthor = request.vars.author or 'no param!'
+   ajaxRoom = request.vars.room or '';
+   delID = request.vars.drawingIndex or '';
+   
+   if ajaxRoom is '':
+      return "Error:"+ajaxRoom+'; '+ajaxData
+      
+   canvasRoom = db(db.room.roomIdentifier == ajaxRoom).select().first();
+   logger.info(canvasRoom);
+   if canvasRoom is None:
+      return 'Does not exist.'
+      
+   else:
+      latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
+      JSONData = json.loads(latest_snap.drawing_stack);
+      del JSONData[min(int(delID), len(JSONData))-1]
+      newData = json.dumps(JSONData)
+      latest_snap.update_record(drawing_stack = newData);
+      return "Deleted!"+delID
+
+   
+   
    
 def saveSnapshot():
    '''a samle ajax call'''
@@ -75,19 +99,9 @@ def saveSnapshot():
                         )
       return 'The page did not previously exist. It has been newly created!' + db(db.drawing.id == snapID).select().first().drawing_stack
       
-      #logger.info("called1!");
    else:
-      #db.drawing.insert(date_created = datetime.utcnow(),
-      #                  roomref = canvasRoom.id,
-      #                  drawing_stack = "",
-      #                  )
       latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
-      #oldData = latest_snap.drawing_stack;
       latest_snap.update_record(drawing_stack = ajaxData);
-      #recent_rev = db(db.drawing.roomref == canvasRoom).select(orderby=~db.drawing.date_created).first()
-      #recent_rev.drawing_stack = ajaxData;
-      #content = "count = " + repr(db(db.drawing.roomref == canvasRoom.id).count()) +"saved!          Old data!" + oldData +"                                            New data!" +  latest_snap.drawing_stack;
-      #logger.info("called2!");
       return "data saved!" + latest_snap.drawing_stack
    
    #objs = []
