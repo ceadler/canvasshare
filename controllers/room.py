@@ -10,6 +10,8 @@ logger = logging.getLogger("web2py.app.canvasshare")
 def index():
    """blank room for now"""
    arg = request.args(0) or ''
+   if arg is '':
+      redirect('default', 'index')
    return dict(arg=arg)
    
 def exists():
