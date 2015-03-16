@@ -1,5 +1,139 @@
 {{extend 'layout.html'}}
 
+<style>
+
+    /*START: Style for the ChatBox*/
+    .containerChat{
+      width:420px;
+      display:block;
+      position: absolute;
+      left: 1075px;
+      top: 119px;
+      margin:0 auto;
+      box-shadow:0 2px 5px rgba(0,0,0,0.4);
+    }
+    .header{
+      padding:20px 20px 18px 20px;
+      background:#5FB471;
+      color:#fff;
+    }
+    .header h2{
+      font-size:16px;
+      line-height:15px;
+      display:inline-block;
+    }
+    .header a{
+      display:inline-block;
+      float:right;
+      background:#3d8b4e;
+      font-size:25px;
+      line-height:20px;
+      padding:3px 6px;
+      margin-top:-5px;
+      border-radius:2px;
+    }
+    .chat-box{
+        overflow-y: scroll;
+        height: 400px;
+    }
+    .chat-box, .enter-message{
+      background:#ECECEC;
+      padding:0 20px;
+      color:#a1a1a1;
+    }
+    .chat-box .message-box{
+      padding:18px 0 10px;
+      clear:both;
+    }
+    .message-box .picture{
+      float:left;
+      width:50px;
+      display:block;
+      padding-right:10px;
+    }
+    .picture img{
+      width:43px;
+      height:48px;
+      border-radius:5px;
+    }
+    .picture span{
+      font-weight:bold;
+      font-size:12px;
+      clear:both;
+      display:block;
+      text-align:center;
+      margin-top:3px;
+    }
+    .message{
+      background:#fff;
+      display:inline-block;
+      padding:13px;
+      width:274px;
+      border-radius:2px;
+      box-shadow: 0 1px 1px rgba(0,0,0,.04);
+      position:relative;
+    }
+    .message:before{
+      content:"";
+      position:absolute;
+      display:block;
+      left:0;
+      border-right:6px solid #fff;
+      border-top: 6px solid transparent;
+      border-bottom:6px solid transparent;
+      top:10px;
+      margin-left:-6px;
+    }
+    .message span{
+      color:#555;
+      font-weight:bold;
+    }
+    .message p{
+      padding-top:5px;
+    }
+    .message-box.right-img .picture{
+      float:right;
+      padding:0;
+      padding-left:10px;
+    }
+    .message-box.right-img .picture img{
+      float:right;
+    }
+    .message-box.right-img .message:before{
+      left:100%;
+      margin-right:6px;
+      margin-left:0;
+      border-right:6px solid transparent;
+      border-left:6px solid #fff;
+      border-top: 6px solid transparent;
+      border-bottom:6px solid transparent;
+    }
+    .enter-message{
+      width:420px;
+      position:absolute;
+      left: 0px;
+      top: 473px;
+      padding:13px 0px;
+    }
+    .enter-message input{
+      border:none;
+      padding:10px 12px;
+      margin:0px 0px 0px 20px;
+      background:#d3d3d3;
+      width:270px;
+      border-radius:2px;
+    }
+    .enter-message a.send{
+      padding:10px 15px;
+      margin:0px 20px;
+      background:#6294c2;
+      border-radius:2px;
+      float:right;
+    }
+    /*END: Style for the ChatBox*/
+    
+</style>
+
 <script>document.body.style.background ="#1a1a1a";</script>
 <script src="{{=URL('static', 'js/colpick.js')}}" type="text/javascript"></script>
 <link rel="stylesheet" href="{{=URL('static', 'css/colpick.css')}}" type="text/css"/>
@@ -30,9 +164,102 @@
    </div>
    <div id="belowCanvas" class="span9"></div>
 </div>
-   <div class="span3" >
-      <p id="chatbox" style="color:white; font-family:Lobster"> this is a chat box! Arg = {{=arg}}</p>
-   </div>
+       <!-- Source:http://www.bypeople.com/chat-box/ -->
+       <div class="containerChat">
+          <div class="header">
+            <h2>{{=arg}} Chat</h2>
+            <a href="#" title="Add Friend to this chat">+</a>
+          </div>
+          <div class="chat-box">
+              
+            <div class="message-box left-img">
+              <div class="picture">
+                <img src="http://31.media.tumblr.com/avatar_91989eab746d_96.png" title="user name"/>
+                <span class="time">10 mins</span>
+              </div>
+              <div class="message">
+                <span>Jon Snow</span>
+                <p>Hey Arya, how are you doing?</p>
+              </div>
+            </div>
+              
+            <div class="message-box right-img">
+              <div class="picture">
+                <img src="https://38.media.tumblr.com/avatar_9dd9bb497b75_128.png" title="user name"/>
+                <span class="time">2 mins</span>
+              </div>
+              <div class="message">
+                <span>Arya Stark</span>
+                <p>Pretty good, Eating nutella, nommommom</p>
+              </div>
+            </div>
+              
+            <div class="message-box left-img">
+              <div class="picture">
+                <img src="http://31.media.tumblr.com/avatar_91989eab746d_96.png" title="user name"/>
+                <span class="time">1 min</span>
+              </div>
+              <div class="message">
+                <span>Jon Snow</span>
+                <p>Save me some!</p>
+              </div>
+            </div>
+              
+              
+              <div class="message-box left-img">
+              <div class="picture">
+                <img src="http://31.media.tumblr.com/avatar_91989eab746d_96.png" title="user name"/>
+                <span class="time">1 min</span>
+              </div>
+              <div class="message">
+                <span>Jon Snow</span>
+                <p>Save me some!</p>
+              </div>
+            </div>
+              
+              
+              <div class="message-box left-img">
+              <div class="picture">
+                <img src="http://31.media.tumblr.com/avatar_91989eab746d_96.png" title="user name"/>
+                <span class="time">1 min</span>
+              </div>
+              <div class="message">
+                <span>Jon Snow</span>
+                <p>Save me some!</p>
+              </div>
+            </div>
+              
+              
+              <div class="message-box left-img">
+              <div class="picture">
+                <img src="http://31.media.tumblr.com/avatar_91989eab746d_96.png" title="user name"/>
+                <span class="time">1 min</span>
+              </div>
+              <div class="message">
+                <span>Jon Snow</span>
+                <p>Save me some!</p>
+              </div>
+            </div>
+              
+              
+              <div class="message-box left-img">
+              <div class="picture">
+                <img src="http://31.media.tumblr.com/avatar_91989eab746d_96.png" title="user name"/>
+                <span class="time">1 min</span>
+              </div>
+              <div class="message">
+                <span>Jon Snow</span>
+                <p>Save me some!</p>
+              </div>
+            </div>
+              
+            <div class="enter-message">
+              <input type="text" placeholder="Enter your message.."/>
+              <a href="#" class="send">Send</a>
+            </div>
+          </div>
+        </div>
+
 </div>
 <script> var roomID = '{{=arg}}' </script>
 <script src={{=URL('static', 'js/canvasDraw.js')}}></script>
