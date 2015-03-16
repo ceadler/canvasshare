@@ -549,7 +549,7 @@ function deleteData(dIndex){
 
    
 function submitData(drawing){
-   console.log("Saving!", JSON.stringify(drawing));
+   //console.log("Saving!", JSON.stringify(drawing));
    $.ajax(
    {
       type: 'POST',

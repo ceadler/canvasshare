@@ -512,6 +512,7 @@ function redrawStack(){
 
 function clearEverything(){
    clearStack();
+   redrawStack();
    clearCanvas(ctx);
    clearCanvas(BGctx);
    fillBackground(BGctx, '#ffffff')

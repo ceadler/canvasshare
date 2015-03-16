@@ -70,7 +70,7 @@ def delete():
    else:
       latest_snap = db(db.drawing.roomref == canvasRoom.id).select(orderby=~db.drawing.date_created).first();
       JSONData = json.loads(latest_snap.drawing_stack);
-      del JSONData[min(int(delID), len(JSONData))-1]
+      del JSONData[min(int(delID), (len(JSONData))-1)]
       newData = json.dumps(JSONData)
       latest_snap.update_record(drawing_stack = newData);
       return "Deleted!"+delID
