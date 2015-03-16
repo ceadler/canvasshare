@@ -19,10 +19,21 @@
 </script>
 
 
+<script src={{=URL('static', 'js/mainPage.js')}}></script>
 <div style="color:white;">
     {{for c in AllCanvas:}}
-    <div class='span4' style='background-color:green; height:200px; width:200px; text-align:center; margin:10px 10px'>
-       {{=A(c.roomIdentifier, _href=URL('room', 'index', args=[c.roomIdentifier]))}}
+    <div class='span4' style='background-color:green; height:200px; 
+                              width:200px; text-align:center; margin:10px 10px;
+                              overflow:hidden'>
+       {{=A(c.roomIdentifier+"_btn", _href=URL('room', 'index', args=[c.roomIdentifier]))}}
+       <canvas id="{{=c.roomIdentifier}}" style="background-color:white;
+                                                 border:1px solid black">
+       </canvas>
     </div>
     {{pass}}
+    <script>var elems = [{{for c in AllCanvas:}} '{{=c.roomIdentifier}}', {{pass}} null];
+            for (e in elems){
+               loadPreview(elems[e]);
+            }
+    </script>
 </div>

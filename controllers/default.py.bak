@@ -15,6 +15,7 @@ def index():
     return dict(AllCanvas=AllCanvas);
 
 def error404():
+   '''Data for this page located in its HTML. Here as a dummy function'''
    return dict()
 
 def user():

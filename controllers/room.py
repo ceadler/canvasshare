@@ -11,7 +11,7 @@ def index():
    """blank room for now"""
    arg = request.args(0) or ''
    if arg is '':
-      redirect('default', 'index')
+      redirect(URL('default', 'index'))
    return dict(arg=arg)
    
 def exists():
