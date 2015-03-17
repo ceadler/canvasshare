@@ -20,6 +20,11 @@ BGcanvas.height = canvas.height;
 $("#elemList").attr('style', 'width:98px; border:1px solid gray; overflow-y:scroll; \
                               height:'+(canvas.height-2)+'px; margin-left:0px');
                               
+$("#chatCont").attr('style', 'border:1px solid gray; /*overflow-y:scroll;*/\
+                              height:'+(canvas.height-2)+'px;\
+                              background-color:#fafafa; position:relative');
+$("#chatBody").height(canvas.height-($("#chatTitle").height()+$("#chatInputCont").height()));
+                              
 $("#clear_btn").click(function(e){clearEverything();})
 
 
@@ -277,9 +282,21 @@ roomExists(function(exists){
       makeSnapshot(drawingStack);
    }
 })
+$("#chatSend").click(function(e){sendChat($("#chatSend").val())})
+$("#chatInput").keydown(function(e){
+   if(e.which == 13){
+      sendChat($("#chatInput").val())
+      $("#chatInput").val("")
+   }
+})
                   
-setInterval(function(){loadDrawings(function(m){clearAndReloadDS(m);
-            redrawStack()})}, 1000)
+setInterval(function(){
+   loadDrawings(function(m){
+      clearAndReloadDS(m);
+      redrawStack();
+   });
+   getChat();
+}, 1000)
 
    
    
@@ -304,8 +321,9 @@ $(document).keydown(function(e){
    //if (e.keyCode == 67){ clearCanvas(BGctx);            // 67 = C
    //                      fillBackground(BGctx, "#fff");}
    //if (e.keyCode == 74){ submitData();}          // 74 = J
-   if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
-   console.log(e.keyCode);
+   else if (e.keyCode == 90 && e.ctrlKey){ cancelDrawing();} // 90 = z key //CHANGE FUNCTION TO undo() LATER
+   else{return true}
+   //console.log(e.keyCode);
 });
 
 
@@ -701,6 +719,28 @@ link.addEventListener('click', function(ev) {
 }, false);
 $('#belowCanvas').append(link);
 
+
+function sendChat(msg){
+   $.ajax(
+   {
+      type:"POST",
+      url: '/'+app_name+'/room/sendMessage',
+      data: 
+      { 
+         room: roomID,
+         message: msg
+      }
+   }).done(function(msg){console.log(msg)})
+}
+
+function getChat(){
+   $.ajax(
+   {
+      type:"GET",
+      url: '/'+app_name+'/room/getMessages/'+roomID
+   }).done(function(messages){$("#chatBody").html(messages);
+                              console.log(messages)})
+}
 // Points Class Prototype Code
 // Here's the points class, not sure where you would like us to implement this
 // or which methods will be needed other than the distance functions.

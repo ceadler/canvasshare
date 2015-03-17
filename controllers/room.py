@@ -112,6 +112,37 @@ def saveSnapshot():
    #   objs.append(unicodeToAscii(obj['tool']))
    return "Echo: " + repr(content)
    
+def getMessages():
+   '''Returns all messages in the Chat'''
+   room = request.args(0) or ''
+   canvasRoom = db(db.room.roomIdentifier == room).select().first();
+   if canvasRoom is None:
+       raise HTTP(204, 'no content');
+   if canvasRoom.chat is None:
+      canvasRoom.update_record(chat='')
+   return canvasRoom.chat
+
+#@auth.requires_signature()  
+def sendMessage():
+   '''submits a message into the database'''
+   room = request.vars.room or '';
+   message = XML(request.vars.message, sanitize=True) or ''
+   canvasRoom = db(db.room.roomIdentifier == room).select().first();
+   if canvasRoom is None:
+       raise HTTP(204, 'no content');
+   if canvasRoom.chat is None:
+      canvasRoom.update_record(chat=message)
+   else:
+      if message == 'clear':
+         canvasRoom.update_record(chat='')
+      else:
+         if canvasRoom.chat == '':
+            data = message
+         else:
+            data = (canvasRoom.chat+'<br>'+message)
+         canvasRoom.update_record(chat=data)
+   return ''
+   
 def createRoom():
    '''an ajax? call for creating a new room'''
    return ''

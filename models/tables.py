@@ -2,7 +2,8 @@ from datetime import datetime
 
 db.define_table('room',
     Field('roomIdentifier'),
-    Field('isPublic', 'boolean')
+    Field('isPublic', 'boolean'),
+    Field('chat', 'text')
     )
     
 db.define_table('drawing',

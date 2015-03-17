@@ -4,9 +4,12 @@
 
 <div class ="span12" style="margin-left:0">
     <p style="text-align:center">
-        {{=A('Create a Room', _class = 'btn', _id = "goButton", _href=URL('room', 'index', args=[]))}}
+        {{=A('Create public room', _class = 'btn', _id = "goButton", _href=URL('room', 'index', args=[]))}}
         <input id = "roomname" placeholder = "Enter A Room Name">
         </input>
+    </p>
+    <p style="color:white; text-align:center">
+       To invite people to this room, just send them the URL once you've made it!
     </p>
 </div>
 
@@ -22,13 +25,16 @@
 <script src={{=URL('static', 'js/mainPage.js')}}></script>
 <div style="color:white;">
     {{for c in AllCanvas:}}
-    <div class='span4' style='background-color:green; height:200px; 
+    <div class='span4' style='background-color:#ccccff; height:200px; 
                               width:200px; text-align:center; margin:10px 10px;
                               overflow:hidden'>
-       {{=A(c.roomIdentifier+"_btn", _href=URL('room', 'index', args=[c.roomIdentifier]))}}
-       <canvas id="{{=c.roomIdentifier}}" style="background-color:white;
-                                                 border:1px solid black">
-       </canvas>
+       {{=A(c.roomIdentifier, _href=URL('room', 'index', args=[c.roomIdentifier]),
+            _style="color:black; font-weight:bold")}}
+       <a href="{{=URL('room', 'index', args=[c.roomIdentifier])}}">
+          <canvas id="{{=c.roomIdentifier}}" style="background-color:white;
+                                                    border:1px solid #aaaaaa">
+          </canvas>
+       </a>
     </div>
     {{pass}}
     <script>var elems = [{{for c in AllCanvas:}} '{{=c.roomIdentifier}}', {{pass}} null];

@@ -69,7 +69,7 @@ function loadPreview(roomID){
    if(roomID != null && roomID != undefined){
       console.log(roomID)
       var context = document.getElementById(roomID).getContext('2d')
-      context.transform(.33, 0, 0, .33, 0, 0)
+      context.transform(.31, 0, 0, .31, 0, 0)
       console.log("after")
       loadDrawings(function(data){
          if (data != '' && data != undefined){
