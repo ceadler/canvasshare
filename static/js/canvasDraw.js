@@ -18,12 +18,15 @@ BGcanvas.width = canvas.width;
 BGcanvas.height = canvas.height;
 
 $("#elemList").attr('style', 'width:98px; border:1px solid gray; overflow-y:scroll; \
-                              height:'+(canvas.height-2)+'px; margin-left:0px');
+                              height:'+(canvas.height-2)+'px; margin-left:0px;background-color:#1A1A1A');
                               
-$("#chatCont").attr('style', 'border:1px solid gray; /*overflow-y:scroll;*/\
-                              height:'+(canvas.height-2)+'px;\
-                              background-color:#fafafa; position:relative');
-$("#chatBody").height(canvas.height-($("#chatTitle").height()+$("#chatInputCont").height()));
+$("#chatCont").attr('style', 'border:1px solid gray;\
+                              height:'+(canvas.height-1)+'px;\
+                              background-color:#1A1A1A; position:relative; color:white;');
+$("#chatBody").attr('style', 'background-color:#1A1A1A;overflow-y:scroll;');
+$("#chatBody").height(canvas.height-($("#chatTitle").height()+$("#chatInputCont").height())-4);
+$("#chatSend").attr('style', 'float:right;');
+$("#chatSend").attr('class', 'btn btn-success');
                               
 $("#clear_btn").click(function(e){clearEverything();})
 
@@ -717,6 +720,7 @@ link.addEventListener('click', function(ev) {
     link.href = BGcanvas.toDataURL();
     link.download = "mypainting.png";
 }, false);
+$('#belowCanvas').attr('style', 'margin:0px;');
 $('#belowCanvas').append(link);
 
 

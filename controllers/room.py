@@ -138,12 +138,13 @@ def sendMessage():
       else:
          if canvasRoom.chat == '':
             data = message
+         elif auth.user is not None:
+            data = (canvasRoom.chat+'<br><span style="font-family:Lobster;color:#cc2c18;font-size:large;">' + auth.user.first_name +'</span>: ' + message)
          else:
-            data = (canvasRoom.chat+'<br>'+message)
+            data = (canvasRoom.chat+'<br><strong style="color:#cac8c4;">Anonymous</strong>: ' +message)
          canvasRoom.update_record(chat=data)
    return ''
    
 def createRoom():
    '''an ajax? call for creating a new room'''
    return ''
-   
