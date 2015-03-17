@@ -136,8 +136,10 @@ def sendMessage():
       if message == 'clear':
          canvasRoom.update_record(chat='')
       else:
-         if canvasRoom.chat == '':
-            data = message
+         if (canvasRoom.chat == '') and auth.user is not None:
+            data = '<span style="font-family:Lobster;color:#cc2c18;font-size:large;">' + auth.user.first_name +'</span>: ' + message
+         elif (canvasRoom.chat == ''):
+            data = '<strong style="color:#cac8c4;">Anonymous</strong>: ' +message
          elif auth.user is not None:
             data = (canvasRoom.chat+'<br><span style="font-family:Lobster;color:#cc2c18;font-size:large;">' + auth.user.first_name +'</span>: ' + message)
          else:

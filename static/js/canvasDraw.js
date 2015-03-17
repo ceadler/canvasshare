@@ -19,12 +19,16 @@ BGcanvas.height = canvas.height;
 
 $("#elemList").attr('style', 'width:98px; border:1px solid gray; overflow-y:scroll; \
                               height:'+(canvas.height-2)+'px; margin-left:0px;background-color:#1A1A1A');
-                              
+
 $("#chatCont").attr('style', 'border:1px solid gray;\
                               height:'+(canvas.height-1)+'px;\
                               background-color:#1A1A1A; position:relative; color:white;');
 $("#chatBody").attr('style', 'background-color:#1A1A1A;overflow-y:scroll;');
 $("#chatBody").height(canvas.height-($("#chatTitle").height()+$("#chatInputCont").height())-4);
+$(document).ready(function(){
+    $("#chatBody").animate({
+        scrollTop: $("#chatBody")[0].scrollHeight*$("#chatBody")[0].scrollHeight}, 2000);
+});
 $("#chatSend").attr('style', 'float:right;');
 $("#chatSend").attr('class', 'btn btn-success');
                               
@@ -285,13 +289,20 @@ roomExists(function(exists){
       makeSnapshot(drawingStack);
    }
 })
-$("#chatSend").click(function(e){sendChat($("#chatSend").val())})
+$("#chatSend").click(function(e){
+    sendChat($("#chatInput").val());
+    $("#chatInput").val("");
+    $("#chatBody").animate({
+        scrollTop: $("#chatBody")[0].scrollHeight*$("#chatBody")[0].scrollHeight}, 2000);
+                                });
 $("#chatInput").keydown(function(e){
    if(e.which == 13){
-      sendChat($("#chatInput").val())
-      $("#chatInput").val("")
+      sendChat($("#chatInput").val());
+      $("#chatInput").val("");
+      $("#chatBody").animate({
+        scrollTop: $("#chatBody")[0].scrollHeight*$("#chatBody")[0].scrollHeight}, 2000);
    }
-})
+});
                   
 setInterval(function(){
    loadDrawings(function(m){
